@@ -1,0 +1,2349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MY SYSTEM</title>
+  <style>
+    /* ============================================================
+       RESET & VARIABLES
+    ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #050506;
+      --card-bg: rgba(255,255,255,0.04);
+      --card-border: rgba(255,255,255,0.06);
+      --text-primary: #F0EDE8;
+      --text-secondary: rgba(240,237,232,0.5);
+      --text-dim: rgba(240,237,232,0.22);
+      --accent-green: #6BE3A4;
+      --accent-amber: #E07658;
+      --accent-red: #E05858;
+      --accent-blue: #5890E0;
+      --accent-purple: #8B5CF6;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+      --font-mono: ui-monospace, "SF Mono", "Menlo", monospace;
+    }
+
+    html, body {
+      min-height: 100vh;
+      background-color: var(--bg);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 14px;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Ambient color washes */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 82% 14%, rgba(224,118,88,0.16) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 60% at 18% 90%, rgba(180,180,200,0.06) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+      animation: ambientDrift 36s ease-in-out infinite alternate;
+    }
+
+    @keyframes ambientDrift {
+      0%   { transform: scale(1)    translate(0,    0);    }
+      33%  { transform: scale(1.05) translate(-1%,  1%);   }
+      66%  { transform: scale(0.97) translate(1%,  -0.5%); }
+      100% { transform: scale(1.03) translate(-0.5%, 0.5%);}
+    }
+
+    /* Film grain */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+      background-size: 120px 120px;
+      opacity: 0.014;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* ============================================================
+       LAYOUT
+    ============================================================ */
+    #app {
+      position: relative;
+      z-index: 2;
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    /* ============================================================
+       HEADER
+    ============================================================ */
+    .header {
+      padding: 28px 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .brand-title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      background: linear-gradient(180deg, #FFFFFF 0%, #C7C4BC 120%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-stats {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .stat-pill {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-secondary);
+      letter-spacing: 0.06em;
+      backdrop-filter: blur(12px);
+    }
+
+    .stat-pill.goals { color: var(--accent-green); border-color: rgba(107,227,164,0.18); }
+
+    /* Water Tracker */
+    .water-tracker {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 5px 12px;
+      backdrop-filter: blur(12px);
+    }
+
+    .water-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: var(--accent-blue);
+      letter-spacing: 0.1em;
+    }
+
+    .water-amount {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-primary);
+      min-width: 90px;
+      text-align: center;
+    }
+
+    .water-grid {
+      display: flex;
+      gap: 2px;
+    }
+
+    .water-day-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 1px;
+      background: rgba(88,144,224,0.12);
+      transition: background 0.3s;
+    }
+
+    .water-day-dot.filled { background: rgba(88,144,224,0.55); }
+    .water-day-dot.today  { background: var(--accent-blue); box-shadow: 0 0 5px rgba(88,144,224,0.6); }
+
+    .water-btn {
+      background: none;
+      border: 1px solid var(--card-border);
+      border-radius: 5px;
+      color: var(--text-secondary);
+      font-size: 14px;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s;
+      line-height: 1;
+    }
+
+    .water-btn:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+
+    /* ============================================================
+       TAB NAVIGATION
+    ============================================================ */
+    .tab-nav {
+      display: flex;
+      gap: 2px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 3px;
+      width: fit-content;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      border-radius: 9px;
+      padding: 7px 18px;
+      font-family: var(--font-sans);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.07em;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover { color: var(--text-primary); }
+
+    .tab-btn.active {
+      background: rgba(255,255,255,0.07);
+      color: var(--text-primary);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.07);
+    }
+
+    /* ============================================================
+       TAB PANELS
+    ============================================================ */
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ============================================================
+       CARDS
+    ============================================================ */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 20px;
+      backdrop-filter: blur(24px) saturate(1.2);
+    }
+
+    .card-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.15em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      margin-bottom: 3px;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--card-border);
+      margin: 16px 0;
+    }
+
+    /* ============================================================
+       LED TICKER
+    ============================================================ */
+    .led-ticker {
+      background: rgba(0,0,0,0.45);
+      border: 1px solid rgba(107,227,164,0.08);
+      border-radius: 10px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      overflow: hidden;
+      position: relative;
+      margin-bottom: 18px;
+      background-image: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(255,255,255,0.008) 2px,
+        rgba(255,255,255,0.008) 4px
+      );
+    }
+
+    .led-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      background: var(--accent-green);
+      box-shadow: 0 0 8px var(--accent-green);
+      flex-shrink: 0;
+      animation: ledPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes ledPulse {
+      0%,100% { opacity:1; box-shadow: 0 0 8px var(--accent-green); }
+      50%      { opacity:0.5; box-shadow: 0 0 3px var(--accent-green); }
+    }
+
+    .led-text-wrap {
+      flex: 1;
+      height: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .led-text {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-secondary);
+      letter-spacing: 0.04em;
+      position: absolute;
+      width: 100%;
+      transition: transform 0.38s ease, opacity 0.38s ease;
+      line-height: 20px;
+    }
+
+    .led-text.out  { transform: translateY(-110%); opacity: 0; }
+    .led-text.in   { transform: translateY(110%);  opacity: 0; }
+    .led-text.show { transform: translateY(0);     opacity: 1; }
+
+    /* ============================================================
+       TAB 1 GRID
+    ============================================================ */
+    .tab1-grid {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    @media (max-width: 860px) {
+      .tab1-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ============================================================
+       DAY RING
+    ============================================================ */
+    .day-ring-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .day-ring-svg-wrap {
+      position: relative;
+      width: 200px;
+      height: 200px;
+    }
+
+    .day-ring-svg { transform: rotate(-90deg); }
+
+    .day-ring-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .ring-percent {
+      font-family: var(--font-mono);
+      font-size: 30px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+
+    .ring-phase {
+      font-family: var(--font-mono);
+      font-size: 8px;
+      letter-spacing: 0.16em;
+      color: var(--text-dim);
+      margin-top: 5px;
+      text-transform: uppercase;
+    }
+
+    .ring-clock {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-top: 7px;
+    }
+
+    .ring-countdown {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: var(--text-dim);
+      margin-top: 3px;
+    }
+
+    /* ============================================================
+       TODOS
+    ============================================================ */
+    .todos-col {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .todo-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .streak-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(224,118,88,0.08);
+      border: 1px solid rgba(224,118,88,0.2);
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--accent-amber);
+      white-space: nowrap;
+    }
+
+    .todo-input-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .todo-input {
+      flex: 1;
+      background: rgba(255,255,255,0.025);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-family: var(--font-sans);
+      font-size: 13px;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .todo-input::placeholder { color: var(--text-dim); }
+    .todo-input:focus { border-color: rgba(255,255,255,0.1); }
+
+    .add-btn {
+      background: rgba(107,227,164,0.08);
+      border: 1px solid rgba(107,227,164,0.18);
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--accent-green);
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .add-btn:hover { background: rgba(107,227,164,0.15); }
+
+    .todo-list {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-height: 32px;
+    }
+
+    .todo-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+      cursor: default;
+      position: relative;
+    }
+
+    .todo-item:hover { background: rgba(255,255,255,0.02); border-color: var(--card-border); }
+
+    .todo-item.done { opacity: 0.4; }
+    .todo-item.done .todo-text { text-decoration: line-through; }
+
+    .todo-item.queued {
+      background: rgba(224,118,88,0.055);
+      border-color: rgba(224,118,88,0.14);
+      animation: qFlash 0.45s ease;
+    }
+
+    @keyframes qFlash {
+      0% { background: rgba(224,118,88,0.22); }
+      100% { background: rgba(224,118,88,0.055); }
+    }
+
+    .drag-handle {
+      color: var(--text-dim);
+      font-size: 10px;
+      cursor: grab;
+      user-select: none;
+      flex-shrink: 0;
+      letter-spacing: -1px;
+    }
+
+    .drag-handle:active { cursor: grabbing; }
+
+    .todo-checkbox {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      border: 1.5px solid rgba(255,255,255,0.12);
+      background: none;
+      cursor: pointer;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+
+    .todo-checkbox.checked {
+      background: rgba(107,227,164,0.12);
+      border-color: var(--accent-green);
+    }
+
+    .todo-checkbox.checked::after {
+      content: '✓';
+      font-size: 10px;
+      color: var(--accent-green);
+    }
+
+    .todo-text {
+      flex: 1;
+      font-size: 13px;
+      color: var(--text-primary);
+      outline: none;
+      min-width: 0;
+      word-break: break-word;
+    }
+
+    .todo-text[contenteditable="true"] {
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+      padding-bottom: 1px;
+    }
+
+    .todo-actions {
+      display: flex;
+      gap: 3px;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+
+    .todo-item:hover .todo-actions { opacity: 1; }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      border-radius: 4px;
+      padding: 3px 5px;
+      font-size: 11px;
+      cursor: pointer;
+      color: var(--text-dim);
+      transition: all 0.15s;
+    }
+
+    .icon-btn:hover { background: rgba(255,255,255,0.06); color: var(--text-secondary); }
+    .icon-btn.amber:hover { color: var(--accent-amber); }
+    .icon-btn.red:hover   { color: var(--accent-red); }
+
+    .push-btn {
+      width: 100%;
+      border: 1.5px dashed rgba(255,255,255,0.07);
+      border-radius: 8px;
+      background: none;
+      padding: 9px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 10px;
+      letter-spacing: 0.08em;
+    }
+
+    .push-btn:hover { border-color: rgba(255,255,255,0.14); color: var(--text-secondary); }
+
+    .card.all-done {
+      background: radial-gradient(ellipse 80% 60% at 50% 100%, rgba(107,227,164,0.07) 0%, transparent 70%),
+                  var(--card-bg);
+    }
+
+    .all-done-tag {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: var(--accent-green);
+      letter-spacing: 0.1em;
+      margin-left: 8px;
+    }
+
+    /* ============================================================
+       TAB 2 GRID
+    ============================================================ */
+    .tab2-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 860px) { .tab2-grid { grid-template-columns: 1fr; } }
+
+    /* Supplements */
+    .supp-window-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      margin: 12px 0 6px;
+      padding-left: 2px;
+    }
+
+    .supp-window-label:first-child { margin-top: 0; }
+
+    .supp-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .supp-item:hover { background: rgba(255,255,255,0.02); border-color: var(--card-border); }
+
+    .supp-item.missed {
+      border-color: rgba(224,88,88,0.25) !important;
+      animation: missFlash 1.6s ease-in-out infinite;
+    }
+
+    @keyframes missFlash {
+      0%,100% { background: rgba(224,88,88,0.05); }
+      50%      { background: rgba(224,88,88,0.12); }
+    }
+
+    .supp-check {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      border: 1.5px solid rgba(255,255,255,0.12);
+      background: none;
+      cursor: pointer;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+
+    .supp-check.checked {
+      background: rgba(107,227,164,0.12);
+      border-color: var(--accent-green);
+    }
+
+    .supp-check.checked::after { content: '✓'; font-size: 10px; color: var(--accent-green); }
+
+    .supp-name { flex: 1; font-size: 12px; color: var(--text-primary); }
+
+    .missed-tag {
+      font-family: var(--font-mono);
+      font-size: 8px;
+      color: var(--accent-red);
+      letter-spacing: 0.06em;
+      border: 1px solid rgba(224,88,88,0.25);
+      border-radius: 4px;
+      padding: 2px 5px;
+      white-space: nowrap;
+    }
+
+    .low-btn {
+      background: none;
+      border: 1px solid var(--card-border);
+      border-radius: 5px;
+      padding: 2px 7px;
+      font-family: var(--font-mono);
+      font-size: 8px;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .low-btn:hover   { border-color: var(--accent-amber); color: var(--accent-amber); }
+    .low-btn.active  { border-color: var(--accent-red); color: var(--accent-red); }
+
+    .supp-ticker {
+      margin-top: 12px;
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(224,88,88,0.12);
+      border-radius: 7px;
+      padding: 7px 12px;
+      overflow: hidden;
+      display: none;
+    }
+
+    .supp-ticker.on { display: block; }
+
+    .ticker-inner {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--accent-red);
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+      display: inline-block;
+      animation: scrollTicker 14s linear infinite;
+    }
+
+    @keyframes scrollTicker {
+      0%   { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+
+    /* Weight tracker */
+    .weight-row { display: flex; gap: 8px; margin-bottom: 14px; }
+
+    .weight-canvas-wrap { width: 100%; height: 80px; }
+
+    .weight-note {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: var(--text-dim);
+      line-height: 1.65;
+      margin-top: 10px;
+    }
+
+    .photo-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .photo-slot {
+      border: 1.5px dashed rgba(255,255,255,0.07);
+      border-radius: 10px;
+      height: 90px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .photo-slot:hover { border-color: rgba(255,255,255,0.14); }
+    .photo-slot-icon  { font-size: 18px; opacity: 0.25; }
+    .photo-slot-lbl   { font-family: var(--font-mono); font-size: 8px; color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase; }
+
+    /* Gym engine */
+    .venue-row { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+
+    .venue-btn {
+      background: none;
+      border: 1px solid var(--card-border);
+      border-radius: 7px;
+      padding: 5px 13px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .venue-btn.active {
+      border-color: rgba(107,227,164,0.28);
+      color: var(--accent-green);
+      background: rgba(107,227,164,0.04);
+    }
+
+    .ex-grid {
+      display: grid;
+      grid-template-columns: 1fr 80px 70px 65px auto;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .ex-input {
+      background: rgba(255,255,255,0.025);
+      border: 1px solid var(--card-border);
+      border-radius: 7px;
+      padding: 7px 9px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-primary);
+      outline: none;
+      width: 100%;
+    }
+
+    .ex-input::placeholder { color: var(--text-dim); }
+    .ex-input:focus { border-color: rgba(255,255,255,0.1); }
+
+    .overload-banner {
+      display: none;
+      background: rgba(107,227,164,0.07);
+      border: 1px solid rgba(107,227,164,0.22);
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin: 12px 0;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--accent-green);
+      letter-spacing: 0.03em;
+      animation: overGlow 2.2s ease-in-out infinite alternate;
+    }
+
+    .overload-banner.on { display: block; }
+
+    @keyframes overGlow {
+      from { box-shadow: 0 0 8px rgba(107,227,164,0.06); }
+      to   { box-shadow: 0 0 22px rgba(107,227,164,0.16); }
+    }
+
+    .workout-done-btn {
+      width: 100%;
+      background: rgba(107,227,164,0.06);
+      border: 1px solid rgba(107,227,164,0.18);
+      border-radius: 10px;
+      padding: 12px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      color: var(--accent-green);
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 14px;
+      text-transform: uppercase;
+    }
+
+    .workout-done-btn:hover { background: rgba(107,227,164,0.12); }
+
+    .comp-row { display: flex; gap: 10px; margin-top: 14px; }
+
+    .comp-badge {
+      flex: 1;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      line-height: 1.6;
+    }
+
+    .comp-badge.muscle { background: rgba(107,227,164,0.05); border: 1px solid rgba(107,227,164,0.14); color: var(--accent-green); }
+    .comp-badge.fat    { background: rgba(224,118,88,0.05);  border: 1px solid rgba(224,118,88,0.14);  color: var(--accent-amber); }
+
+    /* ============================================================
+       TAB 3 GRID
+    ============================================================ */
+    .tab3-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 860px) { .tab3-grid { grid-template-columns: 1fr; } }
+
+    .nw-value {
+      font-family: var(--font-mono);
+      font-size: 34px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #FFFFFF 0%, #C7C4BC 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .nw-meta {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .nw-meta-item {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
+    }
+
+    .nw-meta-item span { color: var(--text-secondary); margin-left: 4px; }
+
+    .pie-wrap {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      margin-top: 14px;
+    }
+
+    .pie-legend {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-secondary);
+    }
+
+    .legend-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .account-list { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+
+    .account-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 11px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--card-border);
+    }
+
+    .acc-type-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .acc-name { flex: 1; font-size: 12px; color: var(--text-primary); }
+    .acc-bal  { font-family: var(--font-mono); font-size: 12px; color: var(--text-primary); }
+
+    .add-acc-form {
+      display: grid;
+      grid-template-columns: 1fr 100px 90px auto;
+      gap: 6px;
+      margin-top: 12px;
+      align-items: center;
+    }
+
+    /* 1% filter */
+    .purchase-row {
+      display: grid;
+      grid-template-columns: 1fr 110px auto;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .purchase-result {
+      border-radius: 8px;
+      padding: 11px 14px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      line-height: 1.65;
+      display: none;
+    }
+
+    .purchase-result.safe  { display: block; background: rgba(107,227,164,0.05); border: 1px solid rgba(107,227,164,0.18); color: var(--accent-green); }
+    .purchase-result.risky { display: block; background: rgba(224,88,88,0.05);   border: 1px solid rgba(224,88,88,0.18);   color: var(--accent-red); }
+
+    /* Order form */
+    .order-form {
+      display: grid;
+      grid-template-columns: 1fr 110px 130px;
+      gap: 8px;
+      margin-bottom: 10px;
+      align-items: end;
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-lbl { font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); letter-spacing: 0.1em; }
+
+    .execute-btn {
+      background: rgba(224,88,88,0.08);
+      border: 1px solid rgba(224,88,88,0.18);
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--accent-red);
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+      width: 100%;
+      margin-bottom: 8px;
+    }
+
+    .execute-btn:hover { background: rgba(224,88,88,0.14); }
+
+    .order-log {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-secondary);
+      min-height: 24px;
+    }
+
+    /* Subscriptions */
+    .sub-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .sub-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 12px;
+      position: relative;
+      transition: all 0.2s;
+    }
+
+    .sub-card.expiring {
+      animation: subWarn 1.8s ease-in-out infinite;
+    }
+
+    @keyframes subWarn {
+      0%,100% { border-color: rgba(224,88,88,0.18); background: rgba(224,88,88,0.035); }
+      50%      { border-color: rgba(224,88,88,0.42); background: rgba(224,88,88,0.09); }
+    }
+
+    .sub-name    { font-size: 12px; font-weight: 500; color: var(--text-primary); margin-bottom: 3px; }
+    .sub-amount  { font-family: var(--font-mono); font-size: 15px; color: var(--text-primary); margin-bottom: 3px; }
+    .sub-renewal { font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); }
+    .sub-warn    { font-family: var(--font-mono); font-size: 8px; color: var(--accent-red); margin-top: 4px; }
+
+    .sub-del {
+      position: absolute;
+      top: 7px; right: 7px;
+      background: none; border: none;
+      color: var(--text-dim); cursor: pointer;
+      font-size: 11px; opacity: 0;
+      transition: opacity 0.15s;
+    }
+
+    .sub-card:hover .sub-del { opacity: 1; }
+    .sub-del:hover { color: var(--accent-red); }
+
+    .add-sub-form {
+      display: grid;
+      grid-template-columns: 1fr 100px 70px auto;
+      gap: 6px;
+      margin-top: 12px;
+      align-items: center;
+    }
+
+    /* ============================================================
+       GENERIC INPUTS
+    ============================================================ */
+    .form-input {
+      background: rgba(255,255,255,0.025);
+      border: 1px solid var(--card-border);
+      border-radius: 7px;
+      padding: 7px 10px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-primary);
+      outline: none;
+      width: 100%;
+      transition: border-color 0.2s;
+    }
+
+    .form-input::placeholder { color: var(--text-dim); }
+    .form-input:focus { border-color: rgba(255,255,255,0.1); }
+
+    .form-select {
+      background: rgba(255,255,255,0.025);
+      border: 1px solid var(--card-border);
+      border-radius: 7px;
+      padding: 7px 10px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-primary);
+      outline: none;
+      width: 100%;
+      cursor: pointer;
+    }
+
+    .form-select option { background: #0a0a0b; }
+
+    .primary-btn {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 7px;
+      padding: 7px 13px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .primary-btn:hover { background: rgba(255,255,255,0.09); }
+
+    .mt-12 { margin-top: 12px; }
+    .mt-16 { margin-top: 16px; }
+
+    /* ============================================================
+       SCROLLBAR
+    ============================================================ */
+    ::-webkit-scrollbar { width: 3px; height: 3px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.07); border-radius: 2px; }
+
+    /* ============================================================
+       TOAST
+    ============================================================ */
+    .toast {
+      position: fixed;
+      bottom: 22px; right: 22px;
+      background: rgba(18,18,20,0.96);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 9px 16px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-secondary);
+      backdrop-filter: blur(20px);
+      z-index: 9999;
+      transform: translateY(16px);
+      opacity: 0;
+      transition: all 0.28s ease;
+      pointer-events: none;
+      max-width: 320px;
+    }
+
+    .toast.show { transform: translateY(0); opacity: 1; }
+  </style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ── HEADER ─────────────────────────────────────── -->
+  <header class="header">
+    <div class="header-top">
+      <div class="brand-title">MY SYSTEM</div>
+      <div class="header-stats">
+        <div class="stat-pill goals" id="goalsPill">GOALS: 0/0 Done</div>
+        <div class="stat-pill">SYS: STACK // VANILLA-JS // SUPABASE</div>
+        <div class="water-tracker">
+          <span class="water-label">H₂O</span>
+          <button class="water-btn" onclick="adjustWater(-250)">−</button>
+          <span class="water-amount" id="waterAmt">0 / 3750 ml</span>
+          <button class="water-btn" onclick="adjustWater(250)">+</button>
+          <div class="water-grid" id="waterGrid"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-nav">
+      <button class="tab-btn active" onclick="switchTab(0,this)">1. FOCUS &amp; ENGINE</button>
+      <button class="tab-btn" onclick="switchTab(1,this)">2. HEALTH &amp; PROGRESSION</button>
+      <button class="tab-btn" onclick="switchTab(2,this)">3. WEALTH &amp; COMMITMENTS</button>
+    </div>
+  </header>
+
+  <!-- ── TAB 1: FOCUS & ENGINE ──────────────────────── -->
+  <div class="tab-panel active" id="tab0">
+
+    <div class="led-ticker">
+      <div class="led-dot"></div>
+      <div class="led-text-wrap">
+        <div class="led-text show" id="ledText">No goals set for today — add one to get rolling.</div>
+      </div>
+    </div>
+
+    <div class="tab1-grid">
+
+      <!-- Day Ring -->
+      <div class="card day-ring-card">
+        <div class="card-label">AWAKE METRIC</div>
+        <div class="day-ring-svg-wrap">
+          <svg class="day-ring-svg" width="200" height="200" viewBox="0 0 200 200">
+            <defs>
+              <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%"   stop-color="#E07658"/>
+                <stop offset="35%"  stop-color="#E05858"/>
+                <stop offset="70%"  stop-color="#5858B0"/>
+                <stop offset="100%" stop-color="#3D2B6E"/>
+              </linearGradient>
+            </defs>
+            <circle cx="100" cy="100" r="80" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="10"/>
+            <circle id="ringArc" cx="100" cy="100" r="80" fill="none"
+              stroke="url(#ringGrad)" stroke-width="10" stroke-linecap="round"
+              stroke-dasharray="502.65" stroke-dashoffset="502.65"/>
+          </svg>
+          <div class="day-ring-center">
+            <div class="ring-percent"  id="ringPct">0%</div>
+            <div class="ring-phase"    id="ringPhase">MORNING</div>
+            <div class="ring-clock"    id="ringClock">8:00 AM</div>
+            <div class="ring-countdown" id="ringCdown">16h 0m left</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Todos -->
+      <div class="todos-col">
+
+        <!-- Today -->
+        <div class="card" id="todayCard">
+          <div class="todo-header">
+            <div>
+              <div class="card-label">TODAY</div>
+              <div class="card-title" id="todayTitle">
+                Focus List
+              </div>
+            </div>
+            <div class="streak-pill" id="streakPill" style="display:none">
+              ⚡ <span id="streakNum">0</span> day streak
+            </div>
+          </div>
+          <div class="todo-input-row">
+            <input class="todo-input" id="todayIn" placeholder="Add a goal for today…"
+              onkeydown="if(event.key==='Enter') addTodo('today')"/>
+            <button class="add-btn" onclick="addTodo('today')">+ ADD</button>
+          </div>
+          <div class="todo-list" id="todayList"
+            ondragover="event.preventDefault()" ondrop="dropTodo(event)"></div>
+          <button class="push-btn" onclick="pushTomorrow()">↓ Push remaining to tomorrow</button>
+        </div>
+
+        <!-- Tomorrow -->
+        <div class="card">
+          <div class="card-label">TOMORROW</div>
+          <div class="card-title">Queued Items</div>
+          <div class="todo-input-row">
+            <input class="todo-input" id="tmrwIn" placeholder="Plan for tomorrow…"
+              onkeydown="if(event.key==='Enter') addTodo('tomorrow')"/>
+            <button class="add-btn" onclick="addTodo('tomorrow')">+ ADD</button>
+          </div>
+          <div class="todo-list" id="tmrwList"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAB 2: HEALTH & PROGRESSION ───────────────── -->
+  <div class="tab-panel" id="tab1">
+    <div class="tab2-grid">
+
+      <!-- Supplements -->
+      <div class="card">
+        <div class="card-label">CLINICAL INTAKE</div>
+        <div class="card-title">Supplement Tracker</div>
+        <div id="suppList"></div>
+        <div class="supp-ticker" id="suppTicker">
+          <span class="ticker-inner" id="tickerText"></span>
+        </div>
+        <div class="divider"></div>
+        <div class="card-label">ADD SUPPLEMENT</div>
+        <div style="display:grid;grid-template-columns:1fr 90px 55px 55px auto;gap:6px;margin-top:8px;align-items:center;">
+          <input class="form-input" id="sName" placeholder="Name [dose]"/>
+          <select class="form-select" id="sWin">
+            <option value="morning">Morning</option>
+            <option value="midday">Midday</option>
+            <option value="evening">Evening</option>
+          </select>
+          <input class="form-input" id="sStart" type="number" placeholder="h start" min="0" max="23"/>
+          <input class="form-input" id="sEnd"   type="number" placeholder="h end"   min="0" max="23"/>
+          <button class="primary-btn" onclick="addSupp()">+ ADD</button>
+        </div>
+      </div>
+
+      <!-- Weight -->
+      <div class="card">
+        <div class="card-label">BODY MASS LOG</div>
+        <div class="card-title">Weight Analytics</div>
+        <div class="weight-row">
+          <input class="form-input" id="wInput" type="number" step="0.1" placeholder="kg today…" style="flex:1"/>
+          <button class="primary-btn" onclick="logWeight()" style="background:rgba(88,144,224,0.08);border-color:rgba(88,144,224,0.18);color:var(--accent-blue);">LOG</button>
+        </div>
+        <div class="weight-canvas-wrap">
+          <canvas id="weightCanvas"></canvas>
+        </div>
+        <div class="weight-note">
+          ⓘ Short-term spikes often reflect glycogen & water retention (≈2–3g H₂O per 1g glycogen). High-carb days can add 0.5–2 kg transiently — not adipose tissue.
+        </div>
+        <div class="photo-compare">
+          <div class="photo-slot" onclick="photoClick('before')">
+            <div class="photo-slot-icon">📷</div>
+            <div class="photo-slot-lbl">Before</div>
+            <div class="photo-slot-lbl" id="beforeMeta" style="color:var(--text-dim);font-size:8px;"></div>
+          </div>
+          <div class="photo-slot" onclick="photoClick('current')">
+            <div class="photo-slot-icon">📷</div>
+            <div class="photo-slot-lbl">Current</div>
+            <div class="photo-slot-lbl" id="currentMeta" style="color:var(--text-dim);font-size:8px;"></div>
+          </div>
+        </div>
+        <input type="file" id="photoIn" accept="image/*" style="display:none" onchange="onPhoto(event)"/>
+      </div>
+
+      <!-- Gym (full-width) -->
+      <div class="card" style="grid-column:1/-1;">
+        <div class="card-label">PROGRESSIVE OVERLOAD ENGINE</div>
+        <div class="card-title">Gym Tracker</div>
+
+        <div class="venue-row">
+          <button class="venue-btn active" id="vHome" onclick="setVenue('Home Base',this)">🏠 Home Base</button>
+          <button class="venue-btn" id="vGym"  onclick="setVenue('Metropolitan Gym',this)">🏙 Metropolitan Gym</button>
+          <div style="margin-left:auto;display:flex;gap:6px;">
+            <button class="venue-btn active" id="sUpper" onclick="setSplit('Upper Push A',this)">Upper Push A</button>
+            <button class="venue-btn"        id="sLower" onclick="setSplit('Lower Quad Focus',this)">Lower Quad Focus</button>
+          </div>
+        </div>
+
+        <div class="overload-banner" id="overloadBanner">
+          🔥 OVERLOAD SUCCESS — INCREASE WEIGHT NEXT SESSION
+        </div>
+
+        <div id="exRows"></div>
+
+        <button class="primary-btn mt-12" onclick="addExRow()" style="width:fit-content;">+ Add Exercise</button>
+        <button class="workout-done-btn" onclick="finishWorkout()">✓ MARK WORKOUT SESSION DONE</button>
+        <div class="comp-row" id="compRow"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── TAB 3: WEALTH & COMMITMENTS ───────────────── -->
+  <div class="tab-panel" id="tab2">
+    <div class="tab3-grid">
+
+      <!-- Net Worth -->
+      <div class="card">
+        <div class="card-label">CAPITAL OVERVIEW</div>
+        <div class="nw-value"  id="nwValue">€0.00</div>
+        <div class="nw-meta">
+          <div class="nw-meta-item">ATH <span id="athVal">€0.00</span></div>
+          <div class="nw-meta-item">ATL <span id="atlVal">€0.00</span></div>
+        </div>
+        <div class="pie-wrap">
+          <canvas id="pieCanvas" width="130" height="130"></canvas>
+          <div class="pie-legend" id="pieLegend"></div>
+        </div>
+        <div class="divider"></div>
+        <div class="card-label">ASSET ACCOUNTS</div>
+        <div class="account-list" id="accList"></div>
+        <div class="add-acc-form mt-12">
+          <input class="form-input" id="aName" placeholder="Account name"/>
+          <select class="form-select" id="aType">
+            <option value="bank">Bank</option>
+            <option value="stock">Investment</option>
+            <option value="crypto">Crypto</option>
+            <option value="other">Other</option>
+          </select>
+          <input class="form-input" id="aBal" type="number" step="0.01" placeholder="€ balance"/>
+          <button class="primary-btn" onclick="addAccount()">+ ADD</button>
+        </div>
+      </div>
+
+      <!-- Right col -->
+      <div style="display:flex;flex-direction:column;gap:16px;">
+
+        <!-- 1% filter -->
+        <div class="card">
+          <div class="card-label">PURCHASE FILTER</div>
+          <div class="card-title">1% Capital Rule</div>
+          <div class="purchase-row">
+            <input class="form-input" id="pName" placeholder="Item name"/>
+            <input class="form-input" id="pPrice" type="number" step="0.01" placeholder="€ price" oninput="checkPurchase()"/>
+            <button class="primary-btn" onclick="checkPurchase()">CHECK</button>
+          </div>
+          <div class="purchase-result" id="pResult"></div>
+        </div>
+
+        <!-- Order deductor -->
+        <div class="card">
+          <div class="card-label">TRANSACTION LOG</div>
+          <div class="card-title">Execute Order</div>
+          <div class="order-form">
+            <div class="form-group">
+              <div class="form-lbl">DESCRIPTION</div>
+              <input class="form-input" id="oDesc" placeholder="Purchase description"/>
+            </div>
+            <div class="form-group">
+              <div class="form-lbl">AMOUNT (€)</div>
+              <input class="form-input" id="oAmt" type="number" step="0.01" placeholder="0.00"/>
+            </div>
+            <div class="form-group">
+              <div class="form-lbl">ACCOUNT</div>
+              <select class="form-select" id="oAcc"></select>
+            </div>
+          </div>
+          <button class="execute-btn" onclick="executeOrder()">⚡ EXECUTE ORDER</button>
+          <div class="order-log" id="orderLog"></div>
+        </div>
+
+        <!-- Subscriptions -->
+        <div class="card">
+          <div class="card-label">ABO LEDGER</div>
+          <div class="card-title">Subscriptions</div>
+          <div class="sub-grid" id="subGrid"></div>
+          <div class="add-sub-form">
+            <input class="form-input" id="subName" placeholder="Service name"/>
+            <input class="form-input" id="subAmt"  type="number" step="0.01" placeholder="€/month"/>
+            <input class="form-input" id="subDay"  type="number" min="1" max="31" placeholder="Day"/>
+            <button class="primary-btn" onclick="addSubscription()">+ ADD</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================================================================
+   SUPABASE CONFIG
+================================================================ */
+const SUPABASE_CONFIG = {
+  url: "https://rdkqtegwkzfdvjphfjfw.supabase.co",
+  anonKey: "sb_publishable_bm7tFZnWbahNF97o_SO9UQ_t4aQdjON"
+};
+
+/* ================================================================
+   SUPABASE API HELPERS
+================================================================ */
+const sb = {
+  ok() {
+    return SUPABASE_CONFIG.url && !SUPABASE_CONFIG.url.includes('YOUR_')
+        && SUPABASE_CONFIG.anonKey && !SUPABASE_CONFIG.anonKey.includes('YOUR_');
+  },
+  hdrs() {
+    return {
+      "Content-Type": "application/json",
+      "apikey": SUPABASE_CONFIG.anonKey,
+      "Authorization": "Bearer " + SUPABASE_CONFIG.anonKey,
+      "Prefer": "return=representation"
+    };
+  },
+  async get(t, q) {
+    if (!this.ok()) return null;
+    try {
+      const r = await fetch(SUPABASE_CONFIG.url + "/rest/v1/" + t + "?" + (q || ""), { headers: this.hdrs() });
+      return r.ok ? r.json() : null;
+    } catch { return null; }
+  },
+  async post(t, body) {
+    if (!this.ok()) return null;
+    try {
+      const r = await fetch(SUPABASE_CONFIG.url + "/rest/v1/" + t, {
+        method: "POST", headers: this.hdrs(), body: JSON.stringify(body)
+      });
+      return r.ok ? r.json() : null;
+    } catch { return null; }
+  },
+  async patch(t, id, body) {
+    if (!this.ok()) return null;
+    try {
+      const r = await fetch(SUPABASE_CONFIG.url + "/rest/v1/" + t + "?id=eq." + id, {
+        method: "PATCH", headers: this.hdrs(), body: JSON.stringify(body)
+      });
+      return r.ok ? r.json() : null;
+    } catch { return null; }
+  },
+  async del(t, id) {
+    if (!this.ok()) return;
+    try {
+      await fetch(SUPABASE_CONFIG.url + "/rest/v1/" + t + "?id=eq." + id, {
+        method: "DELETE", headers: this.hdrs()
+      });
+    } catch {}
+  }
+};
+
+/* ================================================================
+   LOCAL STORAGE
+================================================================ */
+function lsGet(k, fb) {
+  try { const v = localStorage.getItem(k); return v !== null ? JSON.parse(v) : fb; } catch { return fb; }
+}
+function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+
+/* ================================================================
+   HELPERS
+================================================================ */
+function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+function today() { return new Date().toISOString().split("T")[0]; }
+function tomorrow() { return new Date(Date.now() + 86400000).toISOString().split("T")[0]; }
+function esc(s) {
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function fmt(v) {
+  return "€" + (parseFloat(v)||0).toLocaleString("de-DE",{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function fmtShort(v) {
+  if (v >= 1e6) return "€" + (v/1e6).toFixed(1) + "M";
+  if (v >= 1000) return "€" + (v/1000).toFixed(1) + "k";
+  return "€" + v.toFixed(0);
+}
+
+/* ================================================================
+   STATE
+================================================================ */
+const T = today(), TM = tomorrow();
+
+const S = {
+  todos:    lsGet("todos_" + T,  []),
+  tmrw:     lsGet("todos_" + TM, []),
+  water:    lsGet("water_" + T,  0),
+  waterH:   lsGet("waterH", {}),
+  supps:    lsGet("supps", defaultSupps()),
+  sChecked: lsGet("sChecked_" + T, {}),
+  weights:  lsGet("weights", []),
+  workouts: lsGet("workouts", []),
+  accounts: lsGet("accounts", []),
+  subs:     lsGet("subs", []),
+  ath:      lsGet("ath", 0),
+  atl:      lsGet("atl", null),
+  streak:   lsGet("streak", 0),
+  venue:    "Home Base",
+  split:    "Upper Push A",
+  exRows:   [],
+  photoTarget: null,
+  dragIdx: null
+};
+
+function defaultSupps() {
+  return [
+    { id:genId(), name:"Creatine Monohydrate [5g]",  time_window:"morning", start_hour:7,  end_hour:10, is_low:false },
+    { id:genId(), name:"Vitamin D3 [5000 IU]",        time_window:"morning", start_hour:7,  end_hour:10, is_low:false },
+    { id:genId(), name:"Omega-3 Fish Oil [2g]",        time_window:"morning", start_hour:7,  end_hour:10, is_low:false },
+    { id:genId(), name:"L-Theanine [200mg]",           time_window:"midday",  start_hour:12, end_hour:14, is_low:false },
+    { id:genId(), name:"Magnesiumglycinat [400mg]",    time_window:"evening", start_hour:19, end_hour:22, is_low:false },
+    { id:genId(), name:"Zinc Bisglycinate [25mg]",     time_window:"evening", start_hour:19, end_hour:22, is_low:false }
+  ];
+}
+
+/* ================================================================
+   TOAST
+================================================================ */
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove("show"), 2600);
+}
+
+/* ================================================================
+   TAB SWITCHING
+================================================================ */
+function switchTab(i, btn) {
+  document.querySelectorAll(".tab-panel").forEach((p,j) => p.classList.toggle("active", j===i));
+  document.querySelectorAll(".tab-btn").forEach((b,j) => b.classList.toggle("active", j===i));
+  if (i===2) { renderPie(); renderAccounts(); }
+}
+
+/* ================================================================
+   DAY RING
+================================================================ */
+function updateRing() {
+  const now = new Date();
+  const h = now.getHours(), m = now.getMinutes();
+  const WAKE_H = 8, SLEEP_H = 24;
+  const TOTAL = (SLEEP_H - WAKE_H) * 60;
+  const elapsed = Math.max(0, (h - WAKE_H) * 60 + m);
+  const pct = Math.min(100, Math.round(elapsed / TOTAL * 100));
+
+  const C = 2 * Math.PI * 80;
+  document.getElementById("ringArc").style.strokeDashoffset = (C - pct/100 * C).toFixed(2);
+  document.getElementById("ringPct").textContent = pct + "%";
+
+  let phase = "DAWN";
+  if (h >= 8  && h < 11) phase = "MORNING PUSH";
+  else if (h >= 11 && h < 13) phase = "MIDDAY FOCUS";
+  else if (h >= 13 && h < 17) phase = "AFTERNOON";
+  else if (h >= 17 && h < 20) phase = "EVENING WIND";
+  else if (h >= 20 && h < 23) phase = "NIGHT MODE";
+  else if (h >= 23) phase = "BEDTIME";
+  document.getElementById("ringPhase").textContent = phase;
+
+  const ampm = h >= 12 ? "PM" : "AM";
+  const h12  = h % 12 || 12;
+  document.getElementById("ringClock").textContent = h12 + ":" + String(m).padStart(2,"0") + " " + ampm;
+
+  const rem = Math.max(0, TOTAL - elapsed);
+  document.getElementById("ringCdown").textContent = Math.floor(rem/60) + "h " + (rem%60) + "m awake time left";
+}
+setInterval(updateRing, 10000);
+updateRing();
+
+/* ================================================================
+   WATER
+================================================================ */
+async function adjustWater(d) {
+  S.water = Math.max(0, S.water + d);
+  lsSet("water_" + T, S.water);
+  S.waterH[T] = S.water;
+  lsSet("waterH", S.waterH);
+  renderWater();
+  if (sb.ok() && d > 0) await sb.post("water_logs", { date_str: T, amount_ml: d });
+}
+
+function renderWater() {
+  document.getElementById("waterAmt").textContent = S.water + " / 3750 ml";
+  const grid = document.getElementById("waterGrid");
+  grid.innerHTML = "";
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date(Date.now() - i*86400000).toISOString().split("T")[0];
+    const dot = document.createElement("div");
+    dot.className = "water-day-dot" + (d===T ? " today" : (S.waterH[d]>=3750 ? " filled" : ""));
+    grid.appendChild(dot);
+  }
+}
+renderWater();
+
+/* ================================================================
+   LED TICKER
+================================================================ */
+let ledIdx = 0, ledTimer;
+
+function tickerCycle() {
+  const incomplete = S.todos.filter(t => !t.done);
+  let text;
+  if (S.todos.length > 0 && incomplete.length === 0) {
+    text = "✓ All goals done — solid day.";
+  } else if (incomplete.length === 0) {
+    text = "No goals set for today — add one to get rolling.";
+  } else {
+    ledIdx = ledIdx % incomplete.length;
+    text = incomplete[ledIdx].text;
+    ledIdx++;
+  }
+  const el = document.getElementById("ledText");
+  el.classList.remove("show");
+  el.classList.add("out");
+  setTimeout(() => {
+    el.textContent = text;
+    el.classList.remove("out");
+    el.classList.add("in");
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      el.classList.remove("in");
+      el.classList.add("show");
+    }));
+  }, 380);
+}
+
+function startTicker() {
+  clearInterval(ledTimer);
+  tickerCycle();
+  ledTimer = setInterval(tickerCycle, 5000);
+}
+startTicker();
+
+/* ================================================================
+   TODOS
+================================================================ */
+async function addTodo(list) {
+  const id = list === "today" ? "todayIn" : "tmrwIn";
+  const text = document.getElementById(id).value.trim();
+  if (!text) return;
+  const item = { id: genId(), text, done: false, queued: false, date_str: list==="today"?T:TM };
+  if (list === "today") { S.todos.push(item); lsSet("todos_" + T, S.todos); }
+  else                  { S.tmrw.push(item);  lsSet("todos_" + TM, S.tmrw); }
+  document.getElementById(id).value = "";
+  renderTodos();
+  startTicker();
+  if (sb.ok()) {
+    const r = await sb.post("todos", { date_str: item.date_str, text: item.text, done: false, queued: false });
+    if (r && r[0]) { item.id = r[0].id; lsSet("todos_" + T, S.todos); lsSet("todos_" + TM, S.tmrw); }
+  }
+}
+
+async function toggleTodo(id) {
+  const item = S.todos.find(t => t.id === id);
+  if (!item) return;
+  item.done = !item.done;
+  lsSet("todos_" + T, S.todos);
+  renderTodos();
+  checkStreak();
+  startTicker();
+  if (sb.ok()) await sb.patch("todos", id, { done: item.done });
+}
+
+async function queueTodo(id) {
+  const item = S.todos.find(t => t.id === id);
+  if (!item) return;
+  item.queued = !item.queued;
+  lsSet("todos_" + T, S.todos);
+  renderTodos();
+  if (sb.ok()) await sb.patch("todos", id, { queued: item.queued });
+}
+
+async function deleteTodo(id, list) {
+  if (list === "today") { S.todos = S.todos.filter(t => t.id !== id); lsSet("todos_" + T, S.todos); }
+  else                  { S.tmrw  = S.tmrw.filter(t => t.id !== id);  lsSet("todos_" + TM, S.tmrw); }
+  renderTodos();
+  startTicker();
+  if (sb.ok()) await sb.del("todos", id);
+}
+
+function pushTomorrow() {
+  const remaining = S.todos.filter(t => !t.done);
+  remaining.forEach(t => S.tmrw.push({ ...t, id: genId(), date_str: TM, done: false }));
+  S.todos = S.todos.filter(t => t.done);
+  lsSet("todos_" + T, S.todos);
+  lsSet("todos_" + TM, S.tmrw);
+  renderTodos();
+  startTicker();
+  toast("Remaining items pushed to tomorrow");
+}
+
+function checkStreak() {
+  const all = S.todos.length > 0 && S.todos.every(t => t.done);
+  const last = lsGet("streakDate", null);
+  const yest = new Date(Date.now()-86400000).toISOString().split("T")[0];
+  if (all) {
+    if (last !== T) {
+      S.streak = (last === yest) ? S.streak + 1 : 1;
+      lsSet("streak", S.streak);
+      lsSet("streakDate", T);
+    }
+  }
+}
+
+function renderTodos() {
+  const done  = S.todos.filter(t => t.done).length;
+  const total = S.todos.length;
+  document.getElementById("goalsPill").textContent = "GOALS: " + done + "/" + total + " Done";
+
+  const sp = document.getElementById("streakPill");
+  if (S.streak > 0) { sp.style.display = "inline-flex"; document.getElementById("streakNum").textContent = S.streak; }
+  else sp.style.display = "none";
+
+  const allDone = total > 0 && done === total;
+  const card = document.getElementById("todayCard");
+  const title = document.getElementById("todayTitle");
+  if (allDone) {
+    card.classList.add("all-done");
+    title.innerHTML = 'Focus List <span class="all-done-tag">— all done · solid day</span>';
+  } else {
+    card.classList.remove("all-done");
+    title.innerHTML = "Focus List";
+  }
+
+  const todayList = document.getElementById("todayList");
+  todayList.innerHTML = "";
+  S.todos.forEach((item, i) => {
+    const div = document.createElement("div");
+    div.className = "todo-item" + (item.done?" done":"") + (item.queued?" queued":"");
+    div.draggable = true;
+    div.dataset.i = i;
+    div.addEventListener("dragstart", e => { S.dragIdx = i; e.dataTransfer.effectAllowed = "move"; });
+    div.innerHTML =
+      '<span class="drag-handle">⋮⋮</span>' +
+      '<div class="todo-checkbox' + (item.done?" checked":"") + '" onclick="toggleTodo(\'' + item.id + '\')"></div>' +
+      '<div class="todo-text" ondblclick="editTodo(this,\'' + item.id + '\')">' + esc(item.text) + '</div>' +
+      '<div class="todo-actions">' +
+        '<button class="icon-btn amber" title="Queue" onclick="queueTodo(\'' + item.id + '\')">⚑</button>' +
+        '<button class="icon-btn red"   title="Delete" onclick="deleteTodo(\'' + item.id + '\',\'today\')">✕</button>' +
+      '</div>';
+    todayList.appendChild(div);
+  });
+
+  const tmrwList = document.getElementById("tmrwList");
+  tmrwList.innerHTML = "";
+  S.tmrw.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "todo-item";
+    div.innerHTML =
+      '<span class="drag-handle" style="opacity:.15">⋮⋮</span>' +
+      '<div class="todo-checkbox" style="opacity:.4"></div>' +
+      '<div class="todo-text" style="opacity:.55">' + esc(item.text) + '</div>' +
+      '<div class="todo-actions"><button class="icon-btn red" onclick="deleteTodo(\'' + item.id + '\',\'tomorrow\')">✕</button></div>';
+    tmrwList.appendChild(div);
+  });
+}
+
+function editTodo(el, id) {
+  el.contentEditable = "true";
+  el.focus();
+  const handler = () => {
+    el.contentEditable = "false";
+    const item = S.todos.find(t => t.id === id);
+    if (item && el.textContent.trim()) {
+      item.text = el.textContent.trim();
+      lsSet("todos_" + T, S.todos);
+      if (sb.ok()) sb.patch("todos", id, { text: item.text });
+    }
+  };
+  el.addEventListener("blur", handler, { once: true });
+}
+
+function dropTodo(e) {
+  e.preventDefault();
+  const target = e.target.closest(".todo-item");
+  if (!target || S.dragIdx === null) return;
+  const dest = parseInt(target.dataset.i);
+  if (isNaN(dest) || dest === S.dragIdx) return;
+  const [moved] = S.todos.splice(S.dragIdx, 1);
+  S.todos.splice(dest, 0, moved);
+  lsSet("todos_" + T, S.todos);
+  renderTodos();
+  S.dragIdx = null;
+}
+
+renderTodos();
+
+/* ================================================================
+   SUPPLEMENTS
+================================================================ */
+function addSupp() {
+  const name  = document.getElementById("sName").value.trim();
+  const tw    = document.getElementById("sWin").value;
+  const start = parseInt(document.getElementById("sStart").value);
+  const end   = parseInt(document.getElementById("sEnd").value);
+  if (!name || isNaN(start) || isNaN(end)) { toast("Fill all supplement fields"); return; }
+  const s = { id: genId(), name, time_window: tw, start_hour: start, end_hour: end, is_low: false };
+  S.supps.push(s);
+  lsSet("supps", S.supps);
+  document.getElementById("sName").value = "";
+  document.getElementById("sStart").value = "";
+  document.getElementById("sEnd").value = "";
+  renderSupps();
+  if (sb.ok()) sb.post("supplements", { name, time_window: tw, start_hour: start, end_hour: end, is_low: false });
+}
+
+function toggleSuppCheck(id) {
+  S.sChecked[id] = !S.sChecked[id];
+  lsSet("sChecked_" + T, S.sChecked);
+  renderSupps();
+}
+
+function toggleSuppLow(id) {
+  const s = S.supps.find(x => x.id === id);
+  if (!s) return;
+  s.is_low = !s.is_low;
+  lsSet("supps", S.supps);
+  renderSupps();
+  if (sb.ok()) sb.patch("supplements", id, { is_low: s.is_low });
+}
+
+function renderSupps() {
+  const h = new Date().getHours();
+  const list = document.getElementById("suppList");
+  list.innerHTML = "";
+  const wins = [
+    { key:"morning", label:"Morning (07:00–10:00)" },
+    { key:"midday",  label:"Midday (12:00–14:00)" },
+    { key:"evening", label:"Evening (19:00–22:00)" }
+  ];
+  let lowItems = [];
+  wins.forEach(w => {
+    const items = S.supps.filter(s => s.time_window === w.key);
+    if (!items.length) return;
+    const lbl = document.createElement("div");
+    lbl.className = "supp-window-label";
+    lbl.textContent = w.label;
+    list.appendChild(lbl);
+    items.forEach(s => {
+      const checked = S.sChecked[s.id] || false;
+      const missed  = !checked && h > s.end_hour;
+      if (s.is_low) lowItems.push(s.name);
+      const div = document.createElement("div");
+      div.className = "supp-item" + (missed ? " missed" : "");
+      div.innerHTML =
+        '<div class="supp-check' + (checked?" checked":"") + '" onclick="toggleSuppCheck(\'' + s.id + '\')"></div>' +
+        '<span class="supp-name">' + esc(s.name) + '</span>' +
+        (missed ? '<span class="missed-tag">⚠ DOSE MISSED</span>' : '') +
+        '<button class="low-btn' + (s.is_low?" active":"") + '" onclick="toggleSuppLow(\'' + s.id + '\')">' + (s.is_low?"⚠ LOW":"Low?") + '</button>';
+      list.appendChild(div);
+    });
+  });
+  const ticker = document.getElementById("suppTicker");
+  const tickerText = document.getElementById("tickerText");
+  if (lowItems.length > 0) {
+    ticker.classList.add("on");
+    tickerText.textContent = "⚠ RUNNING LOW: " + lowItems.map(n => "[ " + n + " ]").join("  ·  ");
+  } else {
+    ticker.classList.remove("on");
+  }
+}
+renderSupps();
+setInterval(renderSupps, 60000);
+
+/* ================================================================
+   WEIGHT TRACKER
+================================================================ */
+async function logWeight() {
+  const v = parseFloat(document.getElementById("wInput").value);
+  if (isNaN(v) || v <= 0) { toast("Enter a valid weight"); return; }
+  const idx = S.weights.findIndex(w => w.date_str === T);
+  if (idx >= 0) S.weights[idx].weight_kg = v;
+  else S.weights.push({ date_str: T, weight_kg: v });
+  lsSet("weights", S.weights);
+  drawWeightGraph();
+  toast("Weight logged: " + v + " kg");
+  document.getElementById("wInput").value = "";
+  if (sb.ok()) await sb.post("weight_logs", { date_str: T, weight_kg: v });
+}
+
+function drawWeightGraph() {
+  const canvas = document.getElementById("weightCanvas");
+  if (!canvas) return;
+  const W = canvas.parentElement.clientWidth || 360;
+  const H = 80;
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, W, H);
+
+  const logs = S.weights.slice(-30).sort((a,b) => a.date_str.localeCompare(b.date_str));
+  if (logs.length < 2) {
+    ctx.fillStyle = "rgba(240,237,232,0.12)";
+    ctx.font = "10px ui-monospace, monospace";
+    ctx.fillText("Log at least 2 entries to see chart", 10, H/2+4);
+    return;
+  }
+  const vals = logs.map(l => l.weight_kg);
+  const mn = Math.min(...vals) - 0.5, mx = Math.max(...vals) + 0.5;
+  const xS = (W - 20) / (logs.length - 1);
+  const yPos = v => H - 10 - ((v - mn) / (mx - mn)) * (H - 20);
+
+  // goal line
+  ctx.setLineDash([3,4]);
+  ctx.strokeStyle = "rgba(107,227,164,0.18)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(10, yPos(mn + (mx-mn)*0.3));
+  ctx.lineTo(W-10, yPos(mn + (mx-mn)*0.3));
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // line
+  ctx.strokeStyle = "rgba(88,144,224,0.75)";
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  logs.forEach((l,i) => {
+    const x = 10 + i*xS, y = yPos(l.weight_kg);
+    i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+
+  // dots + last label
+  logs.forEach((l,i) => {
+    const x = 10 + i*xS, y = yPos(l.weight_kg);
+    ctx.beginPath(); ctx.arc(x,y,2.5,0,Math.PI*2);
+    ctx.fillStyle = "rgba(88,144,224,0.9)"; ctx.fill();
+    if (i === logs.length-1) {
+      ctx.fillStyle = "rgba(240,237,232,0.65)";
+      ctx.font = "10px ui-monospace, monospace";
+      ctx.fillText(l.weight_kg + "kg", Math.min(x-12, W-50), y-7);
+    }
+  });
+}
+drawWeightGraph();
+
+function photoClick(phase) { S.photoTarget = phase; document.getElementById("photoIn").click(); }
+function onPhoto(e) {
+  if (!e.target.files[0] || !S.photoTarget) return;
+  const wLog = S.weights.find(w => w.date_str === T);
+  document.getElementById(S.photoTarget + "Meta").textContent = T + (wLog ? " · " + wLog.weight_kg + "kg" : "");
+  toast((S.photoTarget === "before" ? "Before" : "Current") + " photo set");
+  S.photoTarget = null;
+  e.target.value = "";
+}
+
+/* ================================================================
+   GYM ENGINE
+================================================================ */
+function setVenue(name, btn) {
+  S.venue = name;
+  document.getElementById("vHome").classList.remove("active");
+  document.getElementById("vGym").classList.remove("active");
+  btn.classList.add("active");
+}
+
+function setSplit(name, btn) {
+  S.split = name;
+  document.getElementById("sUpper").classList.remove("active");
+  document.getElementById("sLower").classList.remove("active");
+  btn.classList.add("active");
+}
+
+function addExRow() {
+  S.exRows.push({ id: genId(), exercise: "", weight: "", reps: "", step: 2.5 });
+  renderExRows();
+}
+
+function removeExRow(i) {
+  S.exRows.splice(i, 1);
+  renderExRows();
+  document.getElementById("overloadBanner").classList.remove("on");
+}
+
+function updateExField(i, field, val) { if (S.exRows[i]) S.exRows[i][field] = val; }
+
+function checkOverload(i, repsVal) {
+  updateExField(i, "reps", repsVal);
+  const reps = parseInt(repsVal);
+  const ex   = S.exRows[i];
+  const banner = document.getElementById("overloadBanner");
+  if (reps >= 8 && ex && ex.exercise) {
+    const next = (parseFloat(ex.weight)||0) + (parseFloat(ex.step)||2.5);
+    banner.textContent = "🔥 OVERLOAD SUCCESS: " + (ex.exercise || "Exercise") + " — INCREASE TO " + next + "kg NEXT SESSION";
+    banner.classList.add("on");
+  } else {
+    banner.classList.remove("on");
+  }
+}
+
+function renderExRows() {
+  const container = document.getElementById("exRows");
+  container.innerHTML = "";
+  S.exRows.forEach((ex, i) => {
+    const div = document.createElement("div");
+    div.className = "ex-grid";
+    div.innerHTML =
+      '<input class="ex-input" placeholder="Exercise" value="' + esc(ex.exercise) + '" oninput="updateExField(' + i + ',\'exercise\',this.value)"/>' +
+      '<input class="ex-input" type="number" placeholder="kg"   value="' + (ex.weight||"") + '" oninput="updateExField(' + i + ',\'weight\',this.value)"/>' +
+      '<input class="ex-input" type="number" placeholder="reps" value="' + (ex.reps||"") + '"   oninput="checkOverload(' + i + ',this.value)"/>' +
+      '<input class="ex-input" type="number" placeholder="step" value="' + (ex.step||"2.5") + '" oninput="updateExField(' + i + ',\'step\',this.value)"/>' +
+      '<button class="icon-btn red" onclick="removeExRow(' + i + ')">✕</button>';
+    container.appendChild(div);
+  });
+}
+
+async function finishWorkout() {
+  const valid = S.exRows.filter(e => e.exercise && e.weight && e.reps);
+  if (!valid.length) { toast("Add exercise data first"); return; }
+
+  valid.forEach(ex => {
+    S.workouts.push({
+      date_str: T, location: S.venue, split_name: S.split,
+      exercise_name: ex.exercise, weight_kg: parseFloat(ex.weight),
+      reps: parseInt(ex.reps), completed: true
+    });
+  });
+  lsSet("workouts", S.workouts);
+
+  // composition estimate
+  const totalVol  = valid.reduce((s,e) => s + (parseFloat(e.weight)||0)*(parseInt(e.reps)||0), 0);
+  const bodyW     = S.weights.slice(-1)[0]?.weight_kg || 75;
+  const ratio     = totalVol / bodyW;
+  const compRow   = document.getElementById("compRow");
+  compRow.innerHTML =
+    '<div class="comp-badge muscle">💪 MUSCLE SYNTHESIS<br><span style="font-size:15px;font-weight:700;">' + ratio.toFixed(0) + '</span> vol/bw<br><span style="font-size:8px;opacity:.65">Anabolic stimulus active</span></div>' +
+    '<div class="comp-badge ' + (totalVol < bodyW*5 ? "fat" : "muscle") + '">' +
+    '📊 TRAINING INTENSITY<br><span style="font-size:15px;font-weight:700;">' + (totalVol < bodyW*5 ? "LOW" : "HIGH") + '</span><br><span style="font-size:8px;opacity:.65">' + totalVol + ' kg total volume</span></div>';
+
+  S.exRows = [];
+  renderExRows();
+  document.getElementById("overloadBanner").classList.remove("on");
+  toast("Workout logged: " + valid.length + " exercises");
+
+  if (sb.ok()) {
+    for (const ex of valid) {
+      await sb.post("workout_logs", {
+        date_str: T, location: S.venue, split_name: S.split,
+        exercise_name: ex.exercise, weight_kg: parseFloat(ex.weight),
+        reps: parseInt(ex.reps), completed: true
+      });
+    }
+  }
+}
+
+/* ================================================================
+   FINANCE — ACCOUNTS
+================================================================ */
+const TYPE_COLORS = { bank:"#5890E0", stock:"#6BE3A4", crypto:"#E07658", other:"#8B5CF6" };
+
+function netWorth() { return S.accounts.reduce((s,a) => s + (parseFloat(a.balance)||0), 0); }
+
+async function addAccount() {
+  const name = document.getElementById("aName").value.trim();
+  const type = document.getElementById("aType").value;
+  const bal  = parseFloat(document.getElementById("aBal").value);
+  if (!name || isNaN(bal)) { toast("Fill name and balance"); return; }
+  const acc = { id: genId(), name, type, balance: bal };
+  S.accounts.push(acc);
+  lsSet("accounts", S.accounts);
+  document.getElementById("aName").value = "";
+  document.getElementById("aBal").value  = "";
+  updateNW(); renderAccounts(); renderPie(); syncOrderDrop();
+  if (sb.ok()) await sb.post("finance_accounts", { name, type, balance: bal });
+}
+
+async function deleteAccount(id) {
+  S.accounts = S.accounts.filter(a => a.id !== id);
+  lsSet("accounts", S.accounts);
+  updateNW(); renderAccounts(); renderPie(); syncOrderDrop();
+  if (sb.ok()) await sb.del("finance_accounts", id);
+}
+
+function updateNW() {
+  const nw = netWorth();
+  document.getElementById("nwValue").textContent = fmt(nw);
+  if (nw > S.ath) { S.ath = nw; lsSet("ath", nw); }
+  if (S.atl === null || nw < S.atl) { S.atl = nw; lsSet("atl", nw); }
+  document.getElementById("athVal").textContent = fmt(S.ath);
+  document.getElementById("atlVal").textContent = fmt(S.atl || 0);
+}
+
+function renderAccounts() {
+  const list = document.getElementById("accList");
+  list.innerHTML = "";
+  S.accounts.forEach(a => {
+    const div = document.createElement("div");
+    div.className = "account-row";
+    div.innerHTML =
+      '<div class="acc-type-dot" style="background:' + (TYPE_COLORS[a.type]||"#888") + '"></div>' +
+      '<div class="acc-name">' + esc(a.name) + '</div>' +
+      '<div class="acc-bal">' + fmt(a.balance) + '</div>' +
+      '<button class="icon-btn red" onclick="deleteAccount(\'' + a.id + '\')">✕</button>';
+    list.appendChild(div);
+  });
+}
+
+function renderPie() {
+  const canvas = document.getElementById("pieCanvas");
+  if (!canvas) return;
+  const W = 130, H = 130;
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, W, H);
+
+  const nw = netWorth();
+  const legend = document.getElementById("pieLegend");
+  legend.innerHTML = "";
+
+  if (nw <= 0 || !S.accounts.length) {
+    ctx.fillStyle = "rgba(255,255,255,0.04)";
+    ctx.beginPath(); ctx.arc(W/2, H/2, 52, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = "rgba(240,237,232,0.18)";
+    ctx.font = "9px ui-monospace, monospace";
+    ctx.textAlign = "center";
+    ctx.fillText("No data", W/2, H/2+4);
+    return;
+  }
+
+  const groups = {};
+  S.accounts.forEach(a => { groups[a.type] = (groups[a.type]||0) + (parseFloat(a.balance)||0); });
+
+  let angle = -Math.PI/2;
+  Object.entries(groups).forEach(([type, val]) => {
+    const sweep = val / nw * 2 * Math.PI;
+    const color = TYPE_COLORS[type] || "#888";
+    ctx.beginPath();
+    ctx.moveTo(W/2, H/2);
+    ctx.arc(W/2, H/2, 52, angle, angle + sweep);
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(W/2, H/2, 26, 0, Math.PI*2);
+    ctx.fillStyle = "#050506";
+    ctx.fill();
+    angle += sweep;
+
+    const li = document.createElement("div");
+    li.className = "legend-item";
+    li.innerHTML = '<div class="legend-dot" style="background:' + color + '"></div><span>' + type.charAt(0).toUpperCase()+type.slice(1) + ' · ' + (val/nw*100).toFixed(1) + '%</span>';
+    legend.appendChild(li);
+  });
+
+  ctx.fillStyle = "rgba(240,237,232,0.4)";
+  ctx.font = "8px ui-monospace, monospace";
+  ctx.textAlign = "center";
+  ctx.fillText("NET", W/2, H/2-2);
+  ctx.fillStyle = "rgba(240,237,232,0.85)";
+  ctx.font = "9px ui-monospace, monospace";
+  ctx.fillText(fmtShort(nw), W/2, H/2+11);
+}
+
+updateNW(); renderAccounts(); renderPie();
+
+/* ================================================================
+   1% PURCHASE FILTER
+================================================================ */
+function checkPurchase() {
+  const name  = document.getElementById("pName").value.trim() || "This item";
+  const price = parseFloat(document.getElementById("pPrice").value);
+  const nw    = netWorth();
+  const el    = document.getElementById("pResult");
+  if (isNaN(price) || price <= 0 || nw <= 0) { el.style.display = "none"; return; }
+  const pct = price / nw * 100;
+  el.className = "purchase-result " + (pct > 1 ? "risky" : "safe");
+  if (pct > 1) {
+    el.innerHTML = "⚠ CAPITAL RULE VIOLATION<br>\"" + esc(name) + "\" costs " + fmt(price) +
+      "<br>→ Consumes <strong>" + pct.toFixed(2) + "%</strong> of Net Worth (limit: 1.00%)" +
+      "<br>Exceeds threshold by " + fmt(price - nw*0.01);
+  } else {
+    el.innerHTML = "✓ WITHIN LIMITS<br>\"" + esc(name) + "\" = <strong>" + pct.toFixed(2) + "%</strong> of Net Worth<br>Below 1% rule — approved";
+  }
+}
+
+/* ================================================================
+   ORDER DEDUCTOR
+================================================================ */
+function syncOrderDrop() {
+  const sel = document.getElementById("oAcc");
+  sel.innerHTML = '<option value="">Select account…</option>';
+  S.accounts.filter(a => a.type === "bank").forEach(a => {
+    const opt = document.createElement("option");
+    opt.value = a.id;
+    opt.textContent = a.name + " (" + fmt(a.balance) + ")";
+    sel.appendChild(opt);
+  });
+}
+
+async function executeOrder() {
+  const desc  = document.getElementById("oDesc").value.trim();
+  const amt   = parseFloat(document.getElementById("oAmt").value);
+  const accId = document.getElementById("oAcc").value;
+  if (!desc || isNaN(amt) || amt <= 0 || !accId) { toast("Fill all order fields"); return; }
+  const acc = S.accounts.find(a => a.id === accId);
+  if (!acc) { toast("Account not found"); return; }
+  acc.balance = parseFloat(acc.balance) - amt;
+  lsSet("accounts", S.accounts);
+  updateNW(); renderAccounts(); renderPie(); syncOrderDrop();
+  const log = document.getElementById("orderLog");
+  const ts  = new Date().toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
+  const entry = document.createElement("div");
+  entry.style.marginBottom = "3px";
+  entry.textContent = "[" + ts + "] " + desc + " · −" + fmt(amt) + " from " + acc.name;
+  log.insertBefore(entry, log.firstChild);
+  document.getElementById("oDesc").value = "";
+  document.getElementById("oAmt").value  = "";
+  toast("Order executed: −" + fmt(amt));
+  if (sb.ok()) await sb.patch("finance_accounts", accId, { balance: acc.balance });
+}
+
+syncOrderDrop();
+
+/* ================================================================
+   SUBSCRIPTIONS
+================================================================ */
+async function addSubscription() {
+  const name = document.getElementById("subName").value.trim();
+  const amt  = parseFloat(document.getElementById("subAmt").value);
+  const day  = parseInt(document.getElementById("subDay").value);
+  if (!name || isNaN(amt) || isNaN(day) || day<1 || day>31) { toast("Fill subscription fields correctly"); return; }
+  const sub = { id: genId(), name, amount: amt, renewal_day: day, last_deducted_month: null };
+  S.subs.push(sub);
+  lsSet("subs", S.subs);
+  document.getElementById("subName").value = "";
+  document.getElementById("subAmt").value  = "";
+  document.getElementById("subDay").value  = "";
+  renderSubs();
+  autoDeduct();
+  if (sb.ok()) await sb.post("subscriptions", { name, amount: amt, renewal_day: day });
+}
+
+async function deleteSub(id) {
+  S.subs = S.subs.filter(s => s.id !== id);
+  lsSet("subs", S.subs);
+  renderSubs();
+  if (sb.ok()) await sb.del("subscriptions", id);
+}
+
+function autoDeduct() {
+  const d  = new Date();
+  const cd = d.getDate();
+  const cm = d.toISOString().slice(0,7);
+  S.subs.forEach(s => {
+    if (s.renewal_day === cd && s.last_deducted_month !== cm) {
+      const bank = S.accounts.find(a => a.type === "bank");
+      if (bank) {
+        bank.balance = parseFloat(bank.balance) - s.amount;
+        s.last_deducted_month = cm;
+        toast("Auto-deducted: " + s.name + " −" + fmt(s.amount));
+      }
+    }
+  });
+  lsSet("subs", S.subs);
+  lsSet("accounts", S.accounts);
+  updateNW(); renderAccounts();
+}
+
+function renderSubs() {
+  const grid = document.getElementById("subGrid");
+  grid.innerHTML = "";
+  const cd = new Date().getDate();
+  S.subs.forEach(s => {
+    const days  = s.renewal_day >= cd ? s.renewal_day - cd : 31 - cd + s.renewal_day;
+    const div   = document.createElement("div");
+    div.className = "sub-card" + (days <= 3 ? " expiring" : "");
+    div.innerHTML =
+      '<div class="sub-name">' + esc(s.name) + '</div>' +
+      '<div class="sub-amount">' + fmt(s.amount) + '<span style="font-size:9px;color:var(--text-dim)">/mo</span></div>' +
+      '<div class="sub-renewal">Day ' + s.renewal_day + ' · ' + days + 'd left</div>' +
+      (days <= 3 ? '<div class="sub-warn">⚠ RENEWING SOON</div>' : '') +
+      '<button class="sub-del" onclick="deleteSub(\'' + s.id + '\')">✕</button>';
+    grid.appendChild(div);
+  });
+}
+
+renderSubs();
+autoDeduct();
+
+/* ================================================================
+   LOAD FROM SUPABASE ON START
+================================================================ */
+async function loadRemote() {
+  if (!sb.ok()) return;
+
+  const rt = await sb.get("todos", "date_str=eq." + T + "&order=created_at.asc");
+  if (rt && rt.length) { S.todos = rt.map(x => ({id:x.id,text:x.text,done:x.done,queued:x.queued,date_str:x.date_str})); lsSet("todos_"+T, S.todos); }
+
+  const rm = await sb.get("todos", "date_str=eq." + TM + "&order=created_at.asc");
+  if (rm && rm.length) { S.tmrw = rm.map(x => ({id:x.id,text:x.text,done:x.done,queued:x.queued,date_str:x.date_str})); lsSet("todos_"+TM, S.tmrw); }
+
+  const rw = await sb.get("water_logs", "date_str=eq." + T);
+  if (rw && rw.length) { S.water = rw.reduce((s,x) => s+(x.amount_ml||0),0); lsSet("water_"+T, S.water); }
+
+  const rs = await sb.get("supplements", "order=name.asc");
+  if (rs && rs.length) { S.supps = rs; lsSet("supps", S.supps); }
+
+  const rwt = await sb.get("weight_logs", "order=date_str.asc&limit=30");
+  if (rwt && rwt.length) { S.weights = rwt; lsSet("weights", S.weights); }
+
+  const ra = await sb.get("finance_accounts", "order=name.asc");
+  if (ra && ra.length) { S.accounts = ra; lsSet("accounts", S.accounts); }
+
+  const rsb = await sb.get("subscriptions", "order=name.asc");
+  if (rsb && rsb.length) { S.subs = rsb.map(x => ({id:x.id,name:x.name,amount:x.amount,renewal_day:x.renewal_day,last_deducted_month:x.last_deducted_month})); lsSet("subs", S.subs); }
+
+  renderTodos(); renderWater(); renderSupps(); drawWeightGraph();
+  updateNW(); renderAccounts(); renderPie(); syncOrderDrop(); renderSubs();
+  startTicker();
+}
+
+loadRemote();
+</script>
+</body>
+</html>
