@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MY SYSTEM</title>
+  <title>FELIX // DASHBOARD</title>
   <style>
     /* ============================================================
        RESET & VARIABLES
@@ -14,15 +14,16 @@
       --bg: #040405;
       --card-bg: rgba(255,255,255,0.035);
       --card-border: rgba(255,255,255,0.055);
-      --text-primary: #F0EDE8;
-      --text-secondary: rgba(240,237,232,0.65);
-      --text-dim: rgba(240,237,232,0.22);
-      --t-12: rgba(240,237,232,0.12);
-      --t-35: rgba(240,237,232,0.35);
-      --t-65: rgba(240,237,232,0.65);
-      --t-90: rgba(240,237,232,0.90);
+      --text-primary: #FAFAFA;
+      --text-secondary: #B8B6B0;
+      --text-tertiary: #76746E;
+      --text-dim: rgba(118,116,110,0.7);
+      --t-12: rgba(250,250,250,0.12);
+      --t-35: rgba(250,250,250,0.35);
+      --t-65: rgba(250,250,250,0.65);
+      --t-90: rgba(250,250,250,0.90);
       --accent-green: #6BE3A4;
-      --accent-amber: #E07658;
+      --accent-amber: #F2C063;
       --accent-red: #E05858;
       --accent-blue: #5890E0;
       --accent-purple: #8B5CF6;
@@ -47,8 +48,8 @@
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
       background:
-        radial-gradient(ellipse 60% 50% at 82% 14%, rgba(224,118,88,0.16) 0%, transparent 70%),
-        radial-gradient(ellipse 50% 60% at 18% 90%, rgba(180,180,200,0.06) 0%, transparent 70%);
+        radial-gradient(ellipse 60% 50% at 82% 14%, rgba(242,192,99,0.10) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 60% at 18% 90%, rgba(107,227,164,0.05) 0%, transparent 70%);
       pointer-events: none;
       z-index: 0;
       animation: ambientDrift 36s ease-in-out infinite alternate;
@@ -106,7 +107,7 @@
       font-size: 20px;
       font-weight: 700;
       letter-spacing: 0.16em;
-      background: linear-gradient(180deg, #FFFFFF 0%, #C7C4BC 120%);
+      background: linear-gradient(180deg, #FAFAFA 0%, #B8B6B0 120%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -210,37 +211,49 @@
     ============================================================ */
     .tab-nav {
       display: flex;
-      gap: 0;
-      background: rgba(255,255,255,0.02);
-      border: 1px solid var(--card-border);
-      border-radius: 10px;
-      padding: 0 4px;
+      gap: 6px;
+      padding: 0;
       width: fit-content;
-      overflow: hidden;
     }
 
     .tab-btn {
-      background: none;
-      border: none;
-      border-radius: 0;
-      border-bottom: 2px solid transparent;
-      padding: 9px 20px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 7px 16px;
       font-family: var(--font-sans);
       font-size: 11px;
       font-weight: 500;
       letter-spacing: 0.07em;
-      color: var(--text-secondary);
+      color: var(--text-tertiary);
       cursor: pointer;
-      transition: color 0.18s, border-color 0.18s;
+      transition: all 0.18s;
       white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    .tab-btn:hover { color: var(--text-primary); }
+    .tab-btn:hover { color: var(--text-secondary); border-color: rgba(255,255,255,0.09); }
 
     .tab-btn.active {
+      background: rgba(255,255,255,0.055);
+      border-color: rgba(255,255,255,0.1);
       color: var(--text-primary);
-      border-bottom-color: var(--accent-green);
     }
+
+    .tab-status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: var(--text-tertiary);
+      transition: background 0.3s;
+    }
+
+    .tab-status-dot.good { background: var(--accent-green); box-shadow: 0 0 5px rgba(107,227,164,0.5); }
+    .tab-status-dot.warn { background: var(--accent-amber); box-shadow: 0 0 5px rgba(242,192,99,0.5); }
+    .tab-status-dot.miss { background: var(--accent-red);   box-shadow: 0 0 5px rgba(224,88,88,0.4); }
 
     /* ============================================================
        TAB PANELS
@@ -257,14 +270,14 @@
       border-radius: 16px;
       padding: 24px;
       backdrop-filter: blur(24px) saturate(1.2);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.45);
       transition: transform 0.2s var(--spring), box-shadow 0.2s ease;
       position: relative;
     }
 
     .card:hover {
-      transform: translateY(-1px);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 6px 28px rgba(0,0,0,0.32);
+      transform: translateY(-2px);
+      box-shadow: 0 20px 56px rgba(0,0,0,0.55);
     }
 
     .card-label {
@@ -398,7 +411,7 @@
       font-weight: 800;
       letter-spacing: -0.03em;
       line-height: 1;
-      background: linear-gradient(135deg, #FFFFFF 30%, #E07658 100%);
+      background: linear-gradient(135deg, #FFFFFF 30%, #F2C063 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -447,8 +460,8 @@
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      background: rgba(224,118,88,0.08);
-      border: 1px solid rgba(224,118,88,0.2);
+      background: rgba(242,192,99,0.08);
+      border: 1px solid rgba(242,192,99,0.2);
       border-radius: 20px;
       padding: 3px 10px;
       font-family: var(--font-mono);
@@ -519,14 +532,14 @@
     .todo-item.done .todo-text { text-decoration: line-through; }
 
     .todo-item.queued {
-      background: rgba(224,118,88,0.055);
-      border-color: rgba(224,118,88,0.14);
+      background: rgba(242,192,99,0.05);
+      border-color: rgba(242,192,99,0.16);
       animation: qFlash 0.45s ease;
     }
 
     @keyframes qFlash {
-      0% { background: rgba(224,118,88,0.22); }
-      100% { background: rgba(224,118,88,0.055); }
+      0% { background: rgba(242,192,99,0.18); }
+      100% { background: rgba(242,192,99,0.05); }
     }
 
     .drag-handle {
@@ -716,7 +729,9 @@
 
     .supp-check.checked::after { content: '✓'; font-size: 10px; color: var(--accent-green); }
 
-    .supp-name { flex: 1; font-size: 12px; color: var(--text-primary); }
+    .supp-name { flex: 1; font-size: 12px; color: var(--text-primary); cursor: text; border-radius: 3px; padding: 1px 3px; transition: background 0.15s; }
+    .supp-name:hover { background: rgba(255,255,255,0.04); }
+    .supp-name[contenteditable="true"] { outline: none; background: rgba(255,255,255,0.06); border-bottom: 1px solid var(--accent-amber); }
 
     .missed-tag {
       font-family: var(--font-mono);
@@ -905,7 +920,7 @@
     }
 
     .comp-badge.muscle { background: rgba(107,227,164,0.05); border: 1px solid rgba(107,227,164,0.14); color: var(--accent-green); }
-    .comp-badge.fat    { background: rgba(224,118,88,0.05);  border: 1px solid rgba(224,118,88,0.14);  color: var(--accent-amber); }
+    .comp-badge.fat    { background: rgba(242,192,99,0.05);  border: 1px solid rgba(242,192,99,0.14);  color: var(--accent-amber); }
 
     /* ============================================================
        TAB 3 GRID
@@ -1326,7 +1341,7 @@
     .hw-row.done .hw-task { text-decoration: line-through; }
 
     .hw-row.urgent { border-color: rgba(224,88,88,0.22); background: rgba(224,88,88,0.03); }
-    .hw-row.soon   { border-color: rgba(224,118,88,0.18); background: rgba(224,118,88,0.03); }
+    .hw-row.soon   { border-color: rgba(242,192,99,0.22); background: rgba(242,192,99,0.03); }
 
     .hw-check {
       width: 16px; height: 16px;
@@ -1421,8 +1436,8 @@
     }
 
     @keyframes amberPulse {
-      0%,100% { box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 0 0 rgba(224,118,88,0); border-color: rgba(255,255,255,0.055); }
-      50%      { box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 0 22px rgba(224,118,88,0.22); border-color: rgba(224,118,88,0.35); }
+      0%,100% { box-shadow: 0 12px 40px rgba(0,0,0,0.45), 0 0 0 rgba(242,192,99,0); border-color: rgba(255,255,255,0.055); }
+      50%      { box-shadow: 0 12px 40px rgba(0,0,0,0.45), 0 0 22px rgba(242,192,99,0.25); border-color: rgba(242,192,99,0.4); }
     }
     .focus-timer-card.active { animation: amberPulse 2.4s ease-in-out infinite; }
 
@@ -1488,7 +1503,7 @@
     }
 
     .preset-btn:hover { border-color: var(--accent-amber); color: var(--accent-amber); }
-    .preset-btn.selected { border-color: var(--accent-amber); color: var(--accent-amber); background: rgba(224,118,88,0.06); }
+    .preset-btn.selected { border-color: var(--accent-amber); color: var(--accent-amber); background: rgba(242,192,99,0.07); }
     .preset-btn:active { transform: scale(0.96); }
 
     .focus-controls { display: flex; gap: 8px; align-items: center; }
@@ -1508,11 +1523,11 @@
     .focus-btn:active { transform: scale(0.96); }
 
     .focus-btn.start {
-      background: rgba(224,118,88,0.1);
-      border-color: rgba(224,118,88,0.28);
+      background: rgba(242,192,99,0.1);
+      border-color: rgba(242,192,99,0.28);
       color: var(--accent-amber);
     }
-    .focus-btn.start:hover { background: rgba(224,118,88,0.18); }
+    .focus-btn.start:hover { background: rgba(242,192,99,0.18); }
 
     .focus-btn.pause {
       background: rgba(88,144,224,0.08);
@@ -1791,10 +1806,10 @@
     </div>
 
     <div class="tab-nav">
-      <button class="tab-btn active" onclick="switchTab(0,this)">FOCUS</button>
-      <button class="tab-btn" onclick="switchTab(1,this)">HEALTH</button>
-      <button class="tab-btn" onclick="switchTab(2,this)">SCHULE</button>
-      <button class="tab-btn" onclick="switchTab(3,this)">WEALTH</button>
+      <button class="tab-btn active" onclick="switchTab(0,this)"><span class="tab-status-dot" id="dot0"></span>FOCUS</button>
+      <button class="tab-btn" onclick="switchTab(1,this)"><span class="tab-status-dot" id="dot1"></span>HEALTH</button>
+      <button class="tab-btn" onclick="switchTab(2,this)"><span class="tab-status-dot" id="dot2"></span>SCHULE</button>
+      <button class="tab-btn" onclick="switchTab(3,this)"><span class="tab-status-dot" id="dot3"></span>WEALTH</button>
     </div>
   </header>
 
@@ -1837,8 +1852,8 @@
           <svg class="focus-ring-svg" width="120" height="120" viewBox="0 0 120 120">
             <defs>
               <linearGradient id="focusGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#E07658"/>
-                <stop offset="100%" stop-color="#E0C058"/>
+                <stop offset="0%" stop-color="#F2C063"/>
+                <stop offset="100%" stop-color="#E8A84A"/>
               </linearGradient>
             </defs>
             <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="8"/>
@@ -2435,6 +2450,47 @@ function toast(msg) {
 }
 
 /* ================================================================
+   STATUS DOTS
+================================================================ */
+function updateStatusDots() {
+  const setDot = (id, state) => {
+    const d = document.getElementById(id);
+    if (d) { d.className = "tab-status-dot " + state; }
+  };
+
+  // Tab 0: FOCUS — green if all todos done, amber if some, miss if none
+  const done = S.todos.filter(t => t.done).length;
+  const total = S.todos.length;
+  if (total === 0) setDot("dot0", "");
+  else if (done === total) setDot("dot0", "good");
+  else if (done > 0) setDot("dot0", "warn");
+  else setDot("dot0", "miss");
+
+  // Tab 1: HEALTH — good if synced today, warn if manual, miss if no data
+  const hl = typeof healthToday !== "undefined" ? healthToday : null;
+  if (hl && hl.synced_at) setDot("dot1", "good");
+  else if (hl) setDot("dot1", "warn");
+  else setDot("dot1", "miss");
+
+  // Tab 2: SCHULE — amber if something urgent, else good
+  const examList = typeof exams !== "undefined" ? exams : [];
+  const hwList   = typeof homework !== "undefined" ? homework : [];
+  const urgentExam = examList.some(e => {
+    const diff = Math.ceil((new Date(e.exam_date) - new Date(T)) / 86400000);
+    return diff >= 0 && diff <= 3;
+  });
+  const urgentHw = hwList.some(h => !h.done && h.due_date === T);
+  if (urgentExam || urgentHw) setDot("dot2", "warn");
+  else setDot("dot2", "good");
+
+  // Tab 3: WEALTH — good if NW > 0, miss otherwise
+  const nw = netWorth();
+  if (nw > 0) setDot("dot3", "good");
+  else if (nw < 0) setDot("dot3", "miss");
+  else setDot("dot3", "");
+}
+
+/* ================================================================
    TAB SWITCHING
 ================================================================ */
 function switchTab(i, btn) {
@@ -2667,6 +2723,7 @@ function renderTodos() {
       '<div class="todo-actions"><button class="icon-btn red" onclick="deleteTodo(\'' + item.id + '\',\'tomorrow\')">✕</button></div>';
     tmrwList.appendChild(div);
   });
+  updateStatusDots();
 }
 
 function editTodo(el, id) {
@@ -2698,6 +2755,7 @@ function dropTodo(e) {
 }
 
 renderTodos();
+updateStatusDots();
 
 /* ================================================================
    SUPPLEMENTS
@@ -2742,6 +2800,28 @@ function toggleSuppLow(id) {
   if (sb.ok()) sb.patch("supplements", id, { is_low: s.is_low });
 }
 
+function editSuppName(el, id) {
+  el.contentEditable = "true";
+  el.focus();
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  window.getSelection().removeAllRanges();
+  window.getSelection().addRange(range);
+  const save = () => {
+    el.contentEditable = "false";
+    const s = S.supps.find(x => x.id === id);
+    if (s && el.textContent.trim()) {
+      s.name = el.textContent.trim();
+      lsSet("supps", S.supps);
+      if (sb.ok()) sb.patch("supplements", id, { name: s.name });
+    } else {
+      renderSupps();
+    }
+  };
+  el.addEventListener("blur", save, { once: true });
+  el.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); el.blur(); } }, { once: true });
+}
+
 function renderSupps() {
   const h = new Date().getHours();
   const list = document.getElementById("suppList");
@@ -2767,8 +2847,8 @@ function renderSupps() {
       div.className = "supp-item" + (missed ? " missed" : "");
       div.innerHTML =
         '<div class="supp-check' + (checked?" checked":"") + '" onclick="toggleSuppCheck(\'' + esc(s.id) + '\')"></div>' +
-        '<span class="supp-name">' + esc(s.name) + '</span>' +
-        (missed ? '<span class="missed-tag">⚠ DOSE MISSED</span>' : '') +
+        '<span class="supp-name" title="Doppelklick zum Bearbeiten" ondblclick="editSuppName(this,\'' + esc(s.id) + '\')">' + esc(s.name) + '</span>' +
+        (missed ? '<span class="missed-tag">⚠ MISSED</span>' : '') +
         '<button class="low-btn' + (s.is_low?" active":"") + '" onclick="toggleSuppLow(\'' + esc(s.id) + '\')">' + (s.is_low?"⚠ LOW":"Low?") + '</button>' +
         '<button class="icon-btn red" title="Löschen" onclick="deleteSupp(\'' + esc(s.id) + '\')">✕</button>';
       list.appendChild(div);
@@ -2969,7 +3049,7 @@ async function finishWorkout() {
 /* ================================================================
    FINANCE — ACCOUNTS
 ================================================================ */
-const TYPE_COLORS = { bank:"#5890E0", stock:"#6BE3A4", crypto:"#E07658", other:"#8B5CF6" };
+const TYPE_COLORS = { bank:"#5890E0", stock:"#6BE3A4", crypto:"#F2C063", other:"#8B5CF6" };
 
 function netWorth() { return S.accounts.reduce((s,a) => s + (parseFloat(a.balance)||0), 0); }
 
@@ -3268,6 +3348,7 @@ async function saveHealthManual() {
   healthToday = data;
   lsSet("health_" + T, data);
   renderHealthVitals(data);
+  updateStatusDots();
   toast("Vitals gespeichert");
   if (sb.ok()) {
     const existing = await sb.get("health_logs", "date_str=eq." + T);
@@ -3364,6 +3445,7 @@ async function addExam() {
   lsSet("exams_local", exams);
   document.getElementById("examSubject").value = "";
   renderExams();
+  updateStatusDots();
   if (sb.ok()) {
     const r = await sb.post("exams", e);
     if (r && r[0]) { e.id = r[0].id; lsSet("exams_local", exams); }
@@ -3374,6 +3456,7 @@ async function deleteExam(id) {
   exams = exams.filter(e => e.id !== id);
   lsSet("exams_local", exams);
   renderExams();
+  updateStatusDots();
   if (sb.ok()) await sb.del("exams", id);
 }
 
