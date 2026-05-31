@@ -88,3 +88,40 @@ CREATE TABLE IF NOT EXISTS daily_reflections (
     mood_score INT NOT NULL CHECK (mood_score BETWEEN 1 AND 5),
     note TEXT
 );
+
+-- 11. HEALTH LOGS (Apple Health / Cal Plus Bridge)
+CREATE TABLE IF NOT EXISTS health_logs (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    date_str TEXT NOT NULL UNIQUE,
+    calories_in NUMERIC(7,1),
+    calories_burned NUMERIC(7,1),
+    steps INT,
+    sleep_hours NUMERIC(4,2),
+    hrv NUMERIC(6,2),
+    active_minutes INT,
+    synced_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- 12. GRADES (Noten-Tracker)
+CREATE TABLE IF NOT EXISTS grades (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    subject TEXT NOT NULL,
+    value NUMERIC(3,2) NOT NULL,
+    weight INT DEFAULT 1,
+    date_str TEXT NOT NULL
+);
+
+-- 13. EXAMS (Prüfungs-Countdown)
+CREATE TABLE IF NOT EXISTS exams (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    subject TEXT NOT NULL,
+    exam_date TEXT NOT NULL
+);
+
+-- 14. HOMEWORK (Hausaufgaben)
+CREATE TABLE IF NOT EXISTS homework (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    task TEXT NOT NULL,
+    due_date TEXT,
+    done BOOLEAN DEFAULT FALSE
+);

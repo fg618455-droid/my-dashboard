@@ -1196,6 +1196,223 @@
     .toast.show { transform: translateY(0); opacity: 1; }
 
     /* ============================================================
+       HEALTH VITALS GRID
+    ============================================================ */
+    .health-vitals-grid {
+      display: grid;
+      grid-template-columns: repeat(4,1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 860px) { .health-vitals-grid { grid-template-columns: 1fr 1fr; } }
+
+    .vital-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .vital-label {
+      font-family: var(--font-mono);
+      font-size: 8px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .vital-value {
+      font-family: var(--font-mono);
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--text-primary);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .vital-sub {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+    }
+
+    .vital-bar-track {
+      width: 100%;
+      height: 3px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .vital-bar {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.6s ease;
+    }
+
+    /* ============================================================
+       SCHOOL MODULE
+    ============================================================ */
+    .grade-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--card-border);
+    }
+
+    .grade-subject { flex: 1; font-size: 12px; color: var(--text-primary); }
+    .grade-badge {
+      font-family: var(--font-mono);
+      font-size: 15px;
+      font-weight: 700;
+      min-width: 32px;
+      text-align: center;
+    }
+    .grade-weight { font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); }
+
+    .exam-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--card-border);
+      transition: all 0.2s;
+    }
+
+    .exam-row.urgent {
+      border-color: rgba(224,88,88,0.3);
+      background: rgba(224,88,88,0.04);
+      animation: examPulse 1.8s ease-in-out infinite;
+    }
+
+    @keyframes examPulse {
+      0%,100% { box-shadow: 0 0 0 rgba(224,88,88,0); }
+      50%      { box-shadow: 0 0 12px rgba(224,88,88,0.15); }
+    }
+
+    .exam-subject { flex: 1; font-size: 13px; color: var(--text-primary); }
+    .exam-date-lbl { font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); }
+
+    .exam-countdown {
+      font-family: var(--font-mono);
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      min-width: 46px;
+      text-align: right;
+    }
+
+    .hw-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .hw-row:hover { background: rgba(255,255,255,0.02); border-color: var(--card-border); }
+    .hw-row.done { opacity: 0.4; }
+    .hw-row.done .hw-task { text-decoration: line-through; }
+
+    .hw-row.urgent { border-color: rgba(224,88,88,0.22); background: rgba(224,88,88,0.03); }
+    .hw-row.soon   { border-color: rgba(224,118,88,0.18); background: rgba(224,118,88,0.03); }
+
+    .hw-check {
+      width: 16px; height: 16px;
+      border-radius: 4px;
+      border: 1.5px solid rgba(255,255,255,0.12);
+      background: none;
+      cursor: pointer;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+    }
+    .hw-check.checked { background: rgba(107,227,164,0.12); border-color: var(--accent-green); }
+    .hw-check.checked::after { content: '✓'; font-size: 10px; color: var(--accent-green); }
+
+    .hw-task { flex: 1; font-size: 12px; color: var(--text-primary); }
+    .hw-due  { font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); white-space: nowrap; }
+
+    /* ============================================================
+       IOS SHORTCUT MODAL
+    ============================================================ */
+    .shortcut-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(4,4,5,0.88);
+      backdrop-filter: blur(12px);
+      z-index: 9998;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .shortcut-modal.open { display: flex; }
+
+    .shortcut-box {
+      background: rgba(20,20,24,0.98);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 28px;
+      max-width: 560px;
+      width: 100%;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+    }
+
+    .shortcut-box h3 {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .shortcut-box p {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.65;
+      margin-bottom: 14px;
+    }
+
+    .shortcut-step {
+      background: rgba(255,255,255,0.025);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    .shortcut-step strong { color: var(--accent-green); }
+
+    .shortcut-url {
+      background: rgba(107,227,164,0.06);
+      border: 1px solid rgba(107,227,164,0.18);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--accent-green);
+      word-break: break-all;
+      margin-bottom: 16px;
+    }
+
+    /* ============================================================
        FOCUS TIMER (POMODORO)
     ============================================================ */
     .focus-timer-card {
@@ -1565,14 +1782,14 @@
   <!-- ── HEADER ─────────────────────────────────────── -->
   <header class="header">
     <div class="header-top">
-      <div class="brand-title">MY SYSTEM</div>
+      <div class="brand-title">FELIX // DASHBOARD</div>
       <div class="header-stats">
         <div class="stat-pill goals" id="goalsPill">GOALS: 0/0 Done</div>
         <div class="stat-pill">SYS: STACK // VANILLA-JS // SUPABASE</div>
         <div class="water-tracker">
           <span class="water-label">H₂O</span>
           <button class="water-btn" onclick="adjustWater(-250)">−</button>
-          <span class="water-amount" id="waterAmt">0 / 3750 ml</span>
+          <span class="water-amount" id="waterAmt">0 / 2000 ml</span>
           <button class="water-btn" onclick="adjustWater(250)">+</button>
           <div class="water-grid" id="waterGrid"></div>
         </div>
@@ -1580,9 +1797,10 @@
     </div>
 
     <div class="tab-nav">
-      <button class="tab-btn active" onclick="switchTab(0,this)">1. FOCUS &amp; ENGINE</button>
-      <button class="tab-btn" onclick="switchTab(1,this)">2. HEALTH &amp; PROGRESSION</button>
-      <button class="tab-btn" onclick="switchTab(2,this)">3. WEALTH &amp; COMMITMENTS</button>
+      <button class="tab-btn active" onclick="switchTab(0,this)">FOCUS</button>
+      <button class="tab-btn" onclick="switchTab(1,this)">HEALTH</button>
+      <button class="tab-btn" onclick="switchTab(2,this)">SCHULE</button>
+      <button class="tab-btn" onclick="switchTab(3,this)">WEALTH</button>
     </div>
   </header>
 
@@ -1816,36 +2034,152 @@
         <input type="file" id="photoIn" accept="image/*" style="display:none" onchange="onPhoto(event)"/>
       </div>
 
-      <!-- Gym (full-width) -->
+      <!-- Apple Health Vitals (full-width) -->
       <div class="card" style="grid-column:1/-1;">
-        <div class="card-label">PROGRESSIVE OVERLOAD ENGINE</div>
-        <div class="card-title">Gym Tracker</div>
-
-        <div class="venue-row">
-          <button class="venue-btn active" id="vHome" onclick="setVenue('Home Base',this)">🏠 Home Base</button>
-          <button class="venue-btn" id="vGym"  onclick="setVenue('Metropolitan Gym',this)">🏙 Metropolitan Gym</button>
-          <div style="margin-left:auto;display:flex;gap:6px;">
-            <button class="venue-btn active" id="sUpper" onclick="setSplit('Upper Push A',this)">Upper Push A</button>
-            <button class="venue-btn"        id="sLower" onclick="setSplit('Lower Quad Focus',this)">Lower Quad Focus</button>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:18px;">
+          <div>
+            <div class="card-label">APPLE HEALTH · CAL PLUS</div>
+            <div class="card-title" style="margin-bottom:0;">Vitals & Activity</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+            <span class="card-label" id="healthSyncTime" style="opacity:0.5;">Nie synchronisiert</span>
+            <button class="primary-btn" onclick="showShortcutGuide()" style="font-size:9px;padding:5px 10px;">iOS Shortcut einrichten ↗</button>
           </div>
         </div>
 
-        <div class="overload-banner" id="overloadBanner">
-          🔥 OVERLOAD SUCCESS — INCREASE WEIGHT NEXT SESSION
+        <div class="health-vitals-grid">
+          <!-- Kalorienbilanz -->
+          <div class="vital-card">
+            <div class="vital-label">KALORIEN HEUTE</div>
+            <div class="vital-value" id="vCalIn">—</div>
+            <div class="vital-sub" id="vCalInGoal">Ziel: 2200 kcal</div>
+            <div class="vital-bar-track"><div class="vital-bar" id="vCalInBar" style="background:var(--accent-green);width:0%"></div></div>
+          </div>
+          <!-- Verbrannte Kalorien -->
+          <div class="vital-card">
+            <div class="vital-label">AKTIVE KALORIEN</div>
+            <div class="vital-value" id="vCalBurned">—</div>
+            <div class="vital-sub">Apple Watch</div>
+            <div class="vital-bar-track"><div class="vital-bar" id="vCalBurnBar" style="background:var(--accent-amber);width:0%"></div></div>
+          </div>
+          <!-- Schritte -->
+          <div class="vital-card">
+            <div class="vital-label">SCHRITTE</div>
+            <div class="vital-value" id="vSteps">—</div>
+            <div class="vital-sub" id="vStepsGoal">Ziel: 10 000</div>
+            <div class="vital-bar-track"><div class="vital-bar" id="vStepsBar" style="background:var(--accent-blue);width:0%"></div></div>
+          </div>
+          <!-- Schlaf -->
+          <div class="vital-card">
+            <div class="vital-label">SCHLAF</div>
+            <div class="vital-value" id="vSleep">—</div>
+            <div class="vital-sub" id="vHrv">HRV: — ms</div>
+            <div class="vital-bar-track"><div class="vital-bar" id="vSleepBar" style="background:var(--accent-purple);width:0%"></div></div>
+          </div>
         </div>
 
-        <div id="exRows"></div>
-
-        <button class="primary-btn mt-12" onclick="addExRow()" style="width:fit-content;">+ Add Exercise</button>
-        <button class="workout-done-btn" onclick="finishWorkout()">✓ MARK WORKOUT SESSION DONE</button>
-        <div class="comp-row" id="compRow"></div>
+        <!-- Manuelle Eingabe als Fallback -->
+        <div class="divider" style="margin:18px 0 14px;"></div>
+        <div class="card-label" style="margin-bottom:10px;">MANUELL EINTRAGEN (Fallback)</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+          <div><div class="card-label" style="margin-bottom:4px;">KKal gegessen</div><input class="form-input" id="hCalIn" type="number" placeholder="kcal" oninput="previewHealth()"/></div>
+          <div><div class="card-label" style="margin-bottom:4px;">KKal verbrannt</div><input class="form-input" id="hCalBurn" type="number" placeholder="kcal" oninput="previewHealth()"/></div>
+          <div><div class="card-label" style="margin-bottom:4px;">Schritte</div><input class="form-input" id="hSteps" type="number" placeholder="steps" oninput="previewHealth()"/></div>
+          <div><div class="card-label" style="margin-bottom:4px;">Schlaf (h)</div><input class="form-input" id="hSleep" type="number" step="0.1" placeholder="7.5h" oninput="previewHealth()"/></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-top:8px;align-items:end;">
+          <div><div class="card-label" style="margin-bottom:4px;">HRV (ms)</div><input class="form-input" id="hHrv" type="number" placeholder="ms"/></div>
+          <div><div class="card-label" style="margin-bottom:4px;">Aktive Min.</div><input class="form-input" id="hActiveMins" type="number" placeholder="min"/></div>
+          <button class="primary-btn" onclick="saveHealthManual()" style="background:rgba(107,227,164,0.08);border-color:rgba(107,227,164,0.2);color:var(--accent-green);height:fit-content;">LOG</button>
+        </div>
       </div>
 
     </div>
   </div>
 
-  <!-- ── TAB 3: WEALTH & COMMITMENTS ───────────────── -->
+  <!-- ── TAB 3: SCHULE ───────────────────────────────── -->
   <div class="tab-panel" id="tab2">
+    <div class="tab2-grid">
+
+      <!-- Noten-Tracker -->
+      <div class="card">
+        <div class="card-label">ACADEMIC RECORD</div>
+        <div class="card-title">Noten-Tracker</div>
+
+        <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:18px;">
+          <div style="font-size:40px;font-weight:800;letter-spacing:-0.03em;background:linear-gradient(135deg,#fff 30%,var(--accent-blue) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;" id="gradeAvg">—</div>
+          <div>
+            <div style="font-size:11px;color:var(--text-secondary);">Gewichteter Schnitt</div>
+            <div class="card-label" id="gradeSubCount">0 Fächer</div>
+          </div>
+        </div>
+
+        <div id="gradeList" style="display:flex;flex-direction:column;gap:4px;margin-bottom:14px;"></div>
+
+        <div class="card-label" style="margin-bottom:8px;">NOTE EINTRAGEN</div>
+        <div style="display:grid;grid-template-columns:1fr 70px 60px auto;gap:6px;align-items:center;">
+          <input class="form-input" id="gSubject" placeholder="Fach (z.B. Mathe)"/>
+          <input class="form-input" id="gValue" type="number" step="0.1" min="1" max="6" placeholder="Note"/>
+          <input class="form-input" id="gWeight" type="number" min="1" max="4" placeholder="Gew." title="Gewichtung (1-4)"/>
+          <button class="primary-btn" onclick="addGrade()" style="background:rgba(88,144,224,0.08);border-color:rgba(88,144,224,0.2);color:var(--accent-blue);">+ ADD</button>
+        </div>
+      </div>
+
+      <!-- Prüfungs-Countdown -->
+      <div class="card">
+        <div class="card-label">EXAM COUNTDOWN</div>
+        <div class="card-title">Prüfungen</div>
+        <div id="examList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;"></div>
+        <div class="card-label" style="margin-bottom:8px;">PRÜFUNG HINZUFÜGEN</div>
+        <div style="display:grid;grid-template-columns:1fr 140px auto;gap:6px;align-items:center;">
+          <input class="form-input" id="examSubject" placeholder="Fach / Prüfung"/>
+          <input class="form-input" id="examDate" type="date"/>
+          <button class="primary-btn" onclick="addExam()" style="background:rgba(224,88,88,0.08);border-color:rgba(224,88,88,0.2);color:var(--accent-red);">+ ADD</button>
+        </div>
+      </div>
+
+      <!-- Hausaufgaben (full-width) -->
+      <div class="card" style="grid-column:1/-1;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <div>
+            <div class="card-label">HOMEWORK HORIZON</div>
+            <div class="card-title" style="margin-bottom:0;">Hausaufgaben</div>
+          </div>
+          <div class="card-label" id="hwPendingCount" style="color:var(--accent-amber);font-size:10px;"></div>
+        </div>
+        <div id="hwList" style="display:flex;flex-direction:column;gap:4px;margin-bottom:14px;"></div>
+        <div style="display:grid;grid-template-columns:1fr 140px auto;gap:6px;align-items:center;">
+          <input class="form-input" id="hwTask" placeholder="Aufgabe (z.B. Mathe S.42 Nr.3)" onkeydown="if(event.key==='Enter')addHomework()"/>
+          <input class="form-input" id="hwDue" type="date"/>
+          <button class="add-btn" onclick="addHomework()">+ ADD</button>
+        </div>
+      </div>
+
+      <!-- Fehlstunden -->
+      <div class="card" style="grid-column:1/-1;">
+        <div class="card-label">ABSENCE LEDGER</div>
+        <div class="card-title">Fehlstunden</div>
+        <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:14px;">
+          <div style="font-size:36px;font-weight:800;letter-spacing:-0.03em;line-height:1;" id="absUsed">0</div>
+          <div style="color:var(--text-dim);font-size:13px;">von <span id="absLimit">10</span> Tagen</div>
+          <button class="primary-btn" onclick="changeAbsLimit()" style="margin-left:auto;font-size:9px;padding:4px 10px;">Limit ändern</button>
+        </div>
+        <div class="vital-bar-track" style="margin-bottom:16px;height:8px;">
+          <div class="vital-bar" id="absBar" style="background:var(--accent-red);height:8px;transition:width 0.4s ease;width:0%;"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:end;">
+          <div><div class="card-label" style="margin-bottom:4px;">DATUM</div><input class="form-input" id="absDate" type="date"/></div>
+          <button class="primary-btn" onclick="addAbsence(1)" style="background:rgba(224,88,88,0.08);border-color:rgba(224,88,88,0.2);color:var(--accent-red);">+ 1 Tag</button>
+          <button class="primary-btn" onclick="addAbsence(-1)" style="color:var(--text-dim);">− 1 Tag</button>
+        </div>
+        <div id="absLog" style="margin-top:12px;display:flex;flex-direction:column;gap:3px;max-height:120px;overflow-y:auto;"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── TAB 4: WEALTH & COMMITMENTS ───────────────── -->
+  <div class="tab-panel" id="tab3">
     <div class="tab3-grid">
 
       <!-- Net Worth -->
@@ -1933,6 +2267,40 @@
     </div>
   </div>
 
+</div>
+
+<!-- iOS Shortcut Setup Modal -->
+<div class="shortcut-modal" id="shortcutModal" onclick="if(event.target===this)closeShortcutGuide()">
+  <div class="shortcut-box">
+    <h3>iOS Shortcut — Apple Health Bridge</h3>
+    <p>Dieser Shortcut läuft täglich automatisch auf deinem iPhone, liest Daten aus Apple Health (inkl. Cal Plus) und schickt sie direkt in deine Supabase-Datenbank.</p>
+    <div class="shortcut-step">
+      <strong>Schritt 1</strong> — Öffne die <strong>Kurzbefehle</strong>-App auf deinem iPhone<br>
+      → Neuen Kurzbefehl erstellen → „Aktion hinzufügen"
+    </div>
+    <div class="shortcut-step">
+      <strong>Schritt 2</strong> — Folgende Aktionen in dieser Reihenfolge hinzufügen:<br>
+      1. <strong>Gesundheit → Menge aufzeichnen</strong> abfragen:<br>
+      &nbsp;&nbsp;&nbsp;• Aktive Energie (kcal) → Variable „burned"<br>
+      &nbsp;&nbsp;&nbsp;• Schritte → Variable „steps"<br>
+      &nbsp;&nbsp;&nbsp;• HRV (ms) → Variable „hrv"<br>
+      &nbsp;&nbsp;&nbsp;• Im Bett verbrachte Zeit → Variable „sleep_h"<br>
+      2. Cal Plus → Apple Health synchronisiert Kalorien automatisch als „Nahrungsenergie"<br>
+      &nbsp;&nbsp;&nbsp;→ Ebenfalls abfragen → Variable „cal_in"
+    </div>
+    <div class="shortcut-step">
+      <strong>Schritt 3</strong> — Aktion „URL abrufen" (POST-Request):<br>
+      Methode: <strong>POST</strong> · Header: apikey + Authorization (dein Supabase Anon Key)<br>
+      Body: JSON mit den Variablen
+    </div>
+    <div class="shortcut-url" id="shortcutUrl">POST → https://rdkqtegwkzfdvjphfjfw.supabase.co/rest/v1/health_logs<br>Body: { "date_str": "DATUM", "calories_in": CAL_IN, "calories_burned": BURNED, "steps": STEPS, "sleep_hours": SLEEP_H, "hrv": HRV }</div>
+    <div class="shortcut-step">
+      <strong>Schritt 4</strong> — Automatisierung einrichten:<br>
+      Kurzbefehle → Automatisierung → + → Tageszeit → <strong>22:00 Uhr täglich</strong><br>
+      → Deinen neuen Shortcut auswählen → „Ohne Rückfrage ausführen"
+    </div>
+    <button class="reflection-save-btn" onclick="closeShortcutGuide()">Verstanden — schließen</button>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -2078,7 +2446,8 @@ function toast(msg) {
 function switchTab(i, btn) {
   document.querySelectorAll(".tab-panel").forEach((p,j) => p.classList.toggle("active", j===i));
   document.querySelectorAll(".tab-btn").forEach((b,j) => b.classList.toggle("active", j===i));
-  if (i===2) { renderPie(); renderAccounts(); }
+  if (i===3) { renderPie(); renderAccounts(); }
+  if (i===2) { renderGrades(); renderExams(); renderHomework(); }
 }
 
 /* ================================================================
@@ -2128,13 +2497,13 @@ async function adjustWater(d) {
 }
 
 function renderWater() {
-  document.getElementById("waterAmt").textContent = S.water + " / 3750 ml";
+  document.getElementById("waterAmt").textContent = S.water + " / 2000 ml";
   const grid = document.getElementById("waterGrid");
   grid.innerHTML = "";
   for (let i = 13; i >= 0; i--) {
     const d = new Date(Date.now() - i*86400000).toISOString().split("T")[0];
     const dot = document.createElement("div");
-    dot.className = "water-day-dot" + (d===T ? " today" : (S.waterH[d]>=3750 ? " filled" : ""));
+    dot.className = "water-day-dot" + (d===T ? " today" : (S.waterH[d]>=2000 ? " filled" : ""));
     grid.appendChild(dot);
   }
 }
@@ -2831,6 +3200,303 @@ renderSubs();
 autoDeduct();
 
 /* ================================================================
+   HEALTH VITALS (Apple Health Bridge)
+================================================================ */
+let healthToday = lsGet("health_" + T, null);
+
+function renderHealthVitals(data) {
+  if (!data) return;
+  const calGoal = 2200, stepsGoal = 10000, sleepGoal = 8;
+
+  const calIn = data.calories_in || 0;
+  document.getElementById("vCalIn").textContent = calIn ? calIn + " kcal" : "—";
+  document.getElementById("vCalInBar").style.width = Math.min(100, calIn / calGoal * 100) + "%";
+  document.getElementById("vCalInBar").style.background = calIn >= calGoal ? "var(--accent-green)" : "var(--accent-amber)";
+
+  const burned = data.calories_burned || 0;
+  document.getElementById("vCalBurned").textContent = burned ? burned + " kcal" : "—";
+  document.getElementById("vCalBurnBar").style.width = Math.min(100, burned / 600 * 100) + "%";
+
+  const steps = data.steps || 0;
+  document.getElementById("vSteps").textContent = steps ? steps.toLocaleString("de-DE") : "—";
+  document.getElementById("vStepsBar").style.width = Math.min(100, steps / stepsGoal * 100) + "%";
+
+  const sleep = data.sleep_hours || 0;
+  document.getElementById("vSleep").textContent = sleep ? sleep.toFixed(1) + "h" : "—";
+  document.getElementById("vSleepBar").style.width = Math.min(100, sleep / sleepGoal * 100) + "%";
+  document.getElementById("vHrv").textContent = data.hrv ? "HRV: " + data.hrv + " ms" : "HRV: —";
+
+  if (data.synced_at) {
+    const d = new Date(data.synced_at);
+    document.getElementById("healthSyncTime").textContent = "Sync: " + d.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
+  }
+}
+
+function previewHealth() {
+  const ci = parseFloat(document.getElementById("hCalIn").value) || 0;
+  const cb = parseFloat(document.getElementById("hCalBurn").value) || 0;
+  const st = parseInt(document.getElementById("hSteps").value) || 0;
+  const sl = parseFloat(document.getElementById("hSleep").value) || 0;
+  const hrv = parseFloat(document.getElementById("hHrv").value) || 0;
+  renderHealthVitals({ calories_in: ci, calories_burned: cb, steps: st, sleep_hours: sl, hrv });
+}
+
+async function saveHealthManual() {
+  const data = {
+    date_str: T,
+    calories_in:     parseFloat(document.getElementById("hCalIn").value) || null,
+    calories_burned: parseFloat(document.getElementById("hCalBurn").value) || null,
+    steps:           parseInt(document.getElementById("hSteps").value) || null,
+    sleep_hours:     parseFloat(document.getElementById("hSleep").value) || null,
+    hrv:             parseFloat(document.getElementById("hHrv").value) || null,
+    active_minutes:  parseInt(document.getElementById("hActiveMins").value) || null,
+    synced_at:       new Date().toISOString()
+  };
+  healthToday = data;
+  lsSet("health_" + T, data);
+  renderHealthVitals(data);
+  toast("Vitals gespeichert");
+  if (sb.ok()) {
+    const existing = await sb.get("health_logs", "date_str=eq." + T);
+    if (existing && existing.length) await sb.patch("health_logs", existing[0].id, data);
+    else await sb.post("health_logs", data);
+  }
+}
+
+function showShortcutGuide() { document.getElementById("shortcutModal").classList.add("open"); }
+function closeShortcutGuide() { document.getElementById("shortcutModal").classList.remove("open"); }
+
+if (healthToday) renderHealthVitals(healthToday);
+
+/* ================================================================
+   SCHOOL MODULE
+================================================================ */
+let grades   = lsGet("grades_local", []);
+let exams    = lsGet("exams_local", []);
+let homework = lsGet("homework_local", []);
+let absences = lsGet("absences_local", { used: 0, limit: 10, log: [] });
+
+/* --- GRADES --- */
+function calcGradeAvg() {
+  if (!grades.length) return null;
+  let sumW = 0, sumWV = 0;
+  grades.forEach(g => { sumWV += g.value * g.weight; sumW += g.weight; });
+  return sumW > 0 ? (sumWV / sumW) : null;
+}
+
+function gradeColor(v) {
+  if (v <= 1.5) return "var(--accent-green)";
+  if (v <= 2.5) return "#A8D5B8";
+  if (v <= 3.5) return "var(--accent-amber)";
+  return "var(--accent-red)";
+}
+
+async function addGrade() {
+  const subject = document.getElementById("gSubject").value.trim();
+  const value   = parseFloat(document.getElementById("gValue").value);
+  const weight  = parseInt(document.getElementById("gWeight").value) || 1;
+  if (!subject || isNaN(value) || value < 1 || value > 6) { toast("Fach und Note (1–6) eingeben"); return; }
+  const g = { id: genId(), subject, value, weight, date_str: T };
+  grades.push(g);
+  lsSet("grades_local", grades);
+  document.getElementById("gSubject").value = "";
+  document.getElementById("gValue").value = "";
+  document.getElementById("gWeight").value = "";
+  renderGrades();
+  if (sb.ok()) {
+    const r = await sb.post("grades", g);
+    if (r && r[0]) { g.id = r[0].id; lsSet("grades_local", grades); }
+  }
+}
+
+async function deleteGrade(id) {
+  grades = grades.filter(g => g.id !== id);
+  lsSet("grades_local", grades);
+  renderGrades();
+  if (sb.ok()) await sb.del("grades", id);
+}
+
+function renderGrades() {
+  const list = document.getElementById("gradeList");
+  const avgEl = document.getElementById("gradeAvg");
+  const countEl = document.getElementById("gradeSubCount");
+  if (!list) return;
+  list.innerHTML = "";
+  const avg = calcGradeAvg();
+  avgEl.textContent = avg !== null ? avg.toFixed(2) : "—";
+  avgEl.style.background = avg !== null ? ("linear-gradient(135deg, " + gradeColor(avg) + " 0%, #ffffff 100%)") : "";
+  countEl.textContent = grades.length + " Einträge";
+  const sorted = [...grades].sort((a,b) => a.subject.localeCompare(b.subject));
+  sorted.forEach(g => {
+    const div = document.createElement("div");
+    div.className = "grade-row";
+    div.innerHTML =
+      '<span class="grade-subject">' + esc(g.subject) + '</span>' +
+      '<span class="grade-badge" style="color:' + gradeColor(g.value) + '">' + g.value + '</span>' +
+      '<span class="grade-weight">×' + g.weight + '</span>' +
+      '<span class="card-label">' + g.date_str + '</span>' +
+      '<button class="icon-btn red" onclick="deleteGrade(\'' + esc(g.id) + '\')">✕</button>';
+    list.appendChild(div);
+  });
+}
+
+/* --- EXAMS --- */
+async function addExam() {
+  const subject = document.getElementById("examSubject").value.trim();
+  const dateStr = document.getElementById("examDate").value;
+  if (!subject || !dateStr) { toast("Fach und Datum eingeben"); return; }
+  const e = { id: genId(), subject, exam_date: dateStr };
+  exams.push(e);
+  exams.sort((a,b) => a.exam_date.localeCompare(b.exam_date));
+  lsSet("exams_local", exams);
+  document.getElementById("examSubject").value = "";
+  renderExams();
+  if (sb.ok()) {
+    const r = await sb.post("exams", e);
+    if (r && r[0]) { e.id = r[0].id; lsSet("exams_local", exams); }
+  }
+}
+
+async function deleteExam(id) {
+  exams = exams.filter(e => e.id !== id);
+  lsSet("exams_local", exams);
+  renderExams();
+  if (sb.ok()) await sb.del("exams", id);
+}
+
+function renderExams() {
+  const list = document.getElementById("examList");
+  if (!list) return;
+  list.innerHTML = "";
+  const now = new Date(); now.setHours(0,0,0,0);
+  exams.forEach(e => {
+    const diff = Math.ceil((new Date(e.exam_date) - now) / 86400000);
+    if (diff < 0) return;
+    const urgent = diff <= 3;
+    const div = document.createElement("div");
+    div.className = "exam-row" + (urgent ? " urgent" : "");
+    const color = diff <= 3 ? "var(--accent-red)" : diff <= 7 ? "var(--accent-amber)" : "var(--text-secondary)";
+    div.innerHTML =
+      '<div style="flex:1"><div class="exam-subject">' + esc(e.subject) + '</div><div class="exam-date-lbl">' + e.exam_date + '</div></div>' +
+      '<div class="exam-countdown" style="color:' + color + '">' + (diff === 0 ? "HEUTE" : diff + "d") + '</div>' +
+      '<button class="icon-btn red" onclick="deleteExam(\'' + esc(e.id) + '\')">✕</button>';
+    list.appendChild(div);
+  });
+  if (!list.children.length) list.innerHTML = '<div style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);padding:8px 0;">Keine anstehenden Prüfungen.</div>';
+}
+
+/* --- HOMEWORK --- */
+async function addHomework() {
+  const task   = document.getElementById("hwTask").value.trim();
+  const dueStr = document.getElementById("hwDue").value;
+  if (!task) { toast("Aufgabe eingeben"); return; }
+  const h = { id: genId(), task, due_date: dueStr || null, done: false };
+  homework.push(h);
+  lsSet("homework_local", homework);
+  document.getElementById("hwTask").value = "";
+  renderHomework();
+  if (sb.ok()) {
+    const r = await sb.post("homework", h);
+    if (r && r[0]) { h.id = r[0].id; lsSet("homework_local", homework); }
+  }
+}
+
+async function toggleHomework(id) {
+  const h = homework.find(x => x.id === id);
+  if (!h) return;
+  h.done = !h.done;
+  lsSet("homework_local", homework);
+  renderHomework();
+  if (sb.ok()) await sb.patch("homework", id, { done: h.done });
+}
+
+async function deleteHomework(id) {
+  homework = homework.filter(x => x.id !== id);
+  lsSet("homework_local", homework);
+  renderHomework();
+  if (sb.ok()) await sb.del("homework", id);
+}
+
+function hwUrgency(dueStr) {
+  if (!dueStr) return 99;
+  const now = new Date(); now.setHours(0,0,0,0);
+  return Math.ceil((new Date(dueStr) - now) / 86400000);
+}
+
+function renderHomework() {
+  const list = document.getElementById("hwList");
+  const countEl = document.getElementById("hwPendingCount");
+  if (!list) return;
+  const pending = homework.filter(h => !h.done);
+  if (countEl) countEl.textContent = pending.length ? pending.length + " offen" : "";
+  const sorted = [...homework].sort((a,b) => {
+    if (a.done !== b.done) return a.done ? 1 : -1;
+    return hwUrgency(a.due_date) - hwUrgency(b.due_date);
+  });
+  list.innerHTML = "";
+  sorted.forEach(h => {
+    const diff = hwUrgency(h.due_date);
+    let cls = "hw-row" + (h.done ? " done" : "");
+    if (!h.done && diff <= 1) cls += " urgent";
+    else if (!h.done && diff <= 3) cls += " soon";
+    const div = document.createElement("div");
+    div.className = cls;
+    div.innerHTML =
+      '<div class="hw-check' + (h.done?" checked":"") + '" onclick="toggleHomework(\'' + esc(h.id) + '\')"></div>' +
+      '<span class="hw-task">' + esc(h.task) + '</span>' +
+      (h.due_date ? '<span class="hw-due">' + h.due_date + (diff>=0&&diff<=3?' · <span style="color:var(--accent-red)">in '+diff+'d</span>':'') + '</span>' : '') +
+      '<button class="icon-btn red" onclick="deleteHomework(\'' + esc(h.id) + '\')">✕</button>';
+    list.appendChild(div);
+  });
+}
+
+/* --- ABSENCES --- */
+function renderAbsences() {
+  const usedEl = document.getElementById("absUsed");
+  const barEl  = document.getElementById("absBar");
+  const logEl  = document.getElementById("absLog");
+  const limitEl = document.getElementById("absLimit");
+  if (!usedEl) return;
+  usedEl.textContent = absences.used;
+  const pct = Math.min(100, absences.used / absences.limit * 100);
+  barEl.style.width = pct + "%";
+  barEl.style.background = pct >= 80 ? "var(--accent-red)" : pct >= 50 ? "var(--accent-amber)" : "rgba(255,255,255,0.3)";
+  limitEl.textContent = absences.limit;
+  logEl.innerHTML = "";
+  [...absences.log].reverse().forEach(entry => {
+    const d = document.createElement("div");
+    d.style.cssText = "font-family:var(--font-mono);font-size:9px;color:var(--text-dim);padding:2px 0;";
+    d.textContent = entry.date + " · " + (entry.delta > 0 ? "+" : "") + entry.delta + " Tag(e)";
+    logEl.appendChild(d);
+  });
+}
+
+function addAbsence(delta) {
+  const dateStr = document.getElementById("absDate").value || T;
+  absences.used = Math.max(0, absences.used + delta);
+  absences.log.push({ date: dateStr, delta });
+  lsSet("absences_local", absences);
+  renderAbsences();
+  toast(delta > 0 ? "Fehltag eingetragen" : "Fehltag korrigiert");
+}
+
+function changeAbsLimit() {
+  const val = prompt("Neues Fehlstunden-Limit (Tage):", absences.limit);
+  if (!val) return;
+  const n = parseInt(val);
+  if (isNaN(n) || n < 1) return;
+  absences.limit = n;
+  lsSet("absences_local", absences);
+  renderAbsences();
+}
+
+renderGrades();
+renderExams();
+renderHomework();
+renderAbsences();
+setInterval(renderExams, 3600000);
+
+/* ================================================================
    FOCUS TIMER (POMODORO)
 ================================================================ */
 const focusState = {
@@ -3284,9 +3950,22 @@ async function loadRemote() {
     lsSet("reflections_local", reflections);
   }
 
+  const rHealth = await sb.get("health_logs", "date_str=eq." + T);
+  if (rHealth && rHealth.length) { healthToday = rHealth[0]; lsSet("health_" + T, healthToday); renderHealthVitals(healthToday); }
+
+  const rGrades = await sb.get("grades", "order=date_str.desc");
+  if (rGrades && rGrades.length) { grades = rGrades; lsSet("grades_local", grades); }
+
+  const rExams = await sb.get("exams", "order=exam_date.asc");
+  if (rExams && rExams.length) { exams = rExams; lsSet("exams_local", exams); }
+
+  const rHw = await sb.get("homework", "order=due_date.asc");
+  if (rHw && rHw.length) { homework = rHw.map(x=>({id:x.id,task:x.task,due_date:x.due_date,done:x.done})); lsSet("homework_local", homework); }
+
   renderTodos(); renderWater(); renderSupps(); drawWeightGraph();
   updateNW(); renderAccounts(); renderPie(); syncOrderDrop(); renderSubs();
   renderHabits(); renderMoodHistory(); drawNwSpark();
+  renderGrades(); renderExams(); renderHomework(); renderAbsences();
   startTicker();
 }
 
