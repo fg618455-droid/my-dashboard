@@ -64,3 +64,27 @@ CREATE TABLE IF NOT EXISTS subscriptions (
     renewal_day INT NOT NULL,
     last_deducted_month TEXT
 );
+
+-- 8. HABITS TABLE (Habit Tracker)
+CREATE TABLE IF NOT EXISTS habits (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    name TEXT NOT NULL,
+    emoji TEXT DEFAULT '✓',
+    color TEXT DEFAULT '#6BE3A4'
+);
+
+-- 9. HABIT LOGS TABLE
+CREATE TABLE IF NOT EXISTS habit_logs (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    habit_id UUID REFERENCES habits(id) ON DELETE CASCADE,
+    date_str TEXT NOT NULL,
+    UNIQUE(habit_id, date_str)
+);
+
+-- 10. DAILY REFLECTIONS TABLE
+CREATE TABLE IF NOT EXISTS daily_reflections (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    date_str TEXT NOT NULL UNIQUE,
+    mood_score INT NOT NULL CHECK (mood_score BETWEEN 1 AND 5),
+    note TEXT
+);
