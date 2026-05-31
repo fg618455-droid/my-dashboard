@@ -1785,14 +1785,8 @@
       <div class="brand-title">FELIX // DASHBOARD</div>
       <div class="header-stats">
         <div class="stat-pill goals" id="goalsPill">GOALS: 0/0 Done</div>
-        <div class="stat-pill">SYS: STACK // VANILLA-JS // SUPABASE</div>
-        <div class="water-tracker">
-          <span class="water-label">H₂O</span>
-          <button class="water-btn" onclick="adjustWater(-250)">−</button>
-          <span class="water-amount" id="waterAmt">0 / 2000 ml</span>
-          <button class="water-btn" onclick="adjustWater(250)">+</button>
-          <div class="water-grid" id="waterGrid"></div>
-        </div>
+        <div class="stat-pill" id="streakHeaderPill" style="display:none;">⚡ <span id="streakHeaderNum">0</span> DAY STREAK</div>
+        <div class="stat-pill" id="healthHeaderPill" style="display:none;" title="Kalorien heute"></div>
       </div>
     </div>
 
@@ -2401,7 +2395,7 @@ const S = {
   tmrw:     lsGet("todos_" + TM, []),
   water:    lsGet("water_" + T,  0),
   waterH:   lsGet("waterH", {}),
-  supps:    lsGet("supps", defaultSupps()),
+  supps:    lsGet("supps", []),
   sChecked: lsGet("sChecked_" + T, {}),
   weights:  lsGet("weights", []),
   workouts: lsGet("workouts", []),
@@ -2628,6 +2622,8 @@ function renderTodos() {
   const sp = document.getElementById("streakPill");
   if (S.streak > 0) { sp.style.display = "inline-flex"; document.getElementById("streakNum").textContent = S.streak; }
   else sp.style.display = "none";
+  const hsp = document.getElementById("streakHeaderPill");
+  if (hsp) { if (S.streak > 0) { hsp.style.display = "flex"; document.getElementById("streakHeaderNum").textContent = S.streak; } else hsp.style.display = "none"; }
 
   const allDone = total > 0 && done === total;
   const card = document.getElementById("todayCard");
@@ -2728,6 +2724,15 @@ function toggleSuppCheck(id) {
   renderSupps();
 }
 
+async function deleteSupp(id) {
+  S.supps = S.supps.filter(s => s.id !== id);
+  delete S.sChecked[id];
+  lsSet("supps", S.supps);
+  lsSet("sChecked_" + T, S.sChecked);
+  renderSupps();
+  if (sb.ok()) await sb.del("supplements", id);
+}
+
 function toggleSuppLow(id) {
   const s = S.supps.find(x => x.id === id);
   if (!s) return;
@@ -2761,10 +2766,11 @@ function renderSupps() {
       const div = document.createElement("div");
       div.className = "supp-item" + (missed ? " missed" : "");
       div.innerHTML =
-        '<div class="supp-check' + (checked?" checked":"") + '" onclick="toggleSuppCheck(\'' + s.id + '\')"></div>' +
+        '<div class="supp-check' + (checked?" checked":"") + '" onclick="toggleSuppCheck(\'' + esc(s.id) + '\')"></div>' +
         '<span class="supp-name">' + esc(s.name) + '</span>' +
         (missed ? '<span class="missed-tag">⚠ DOSE MISSED</span>' : '') +
-        '<button class="low-btn' + (s.is_low?" active":"") + '" onclick="toggleSuppLow(\'' + s.id + '\')">' + (s.is_low?"⚠ LOW":"Low?") + '</button>';
+        '<button class="low-btn' + (s.is_low?" active":"") + '" onclick="toggleSuppLow(\'' + esc(s.id) + '\')">' + (s.is_low?"⚠ LOW":"Low?") + '</button>' +
+        '<button class="icon-btn red" title="Löschen" onclick="deleteSupp(\'' + esc(s.id) + '\')">✕</button>';
       list.appendChild(div);
     });
   });
@@ -3229,6 +3235,13 @@ function renderHealthVitals(data) {
   if (data.synced_at) {
     const d = new Date(data.synced_at);
     document.getElementById("healthSyncTime").textContent = "Sync: " + d.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
+  }
+  const hp = document.getElementById("healthHeaderPill");
+  if (hp && (data.calories_in || data.calories_burned)) {
+    hp.style.display = "flex";
+    const bal = (data.calories_in||0) - (data.calories_burned||0);
+    hp.textContent = "🔥 " + (data.calories_in||"?") + " kcal · " + (bal>=0?"+":"") + bal + " Bilanz";
+    hp.style.color = bal >= 0 ? "var(--accent-green)" : "var(--accent-amber)";
   }
 }
 
