@@ -1779,6 +1779,311 @@
     }
 
     /* ============================================================
+       WATER SMART TRACKER
+    ============================================================ */
+    .water-smart-meter {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 14px 0;
+    }
+
+    .water-smart-value {
+      font-family: var(--font-mono);
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--accent-blue);
+      min-width: 130px;
+      line-height: 1;
+    }
+
+    .water-smart-of {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-tertiary);
+      margin-top: 4px;
+    }
+
+    .water-progress-track {
+      flex: 1;
+      height: 8px;
+      background: rgba(88,144,224,0.08);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .water-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #5890E0, #6BE3A4);
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+
+    .water-btn-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin: 10px 0;
+    }
+
+    .water-add-btn {
+      background: rgba(88,144,224,0.07);
+      border: 1px solid rgba(88,144,224,0.18);
+      border-radius: 8px;
+      padding: 7px 14px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--accent-blue);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .water-add-btn:hover { background: rgba(88,144,224,0.14); }
+    .water-add-btn:active { transform: scale(0.96); }
+
+    .water-history-dots {
+      display: flex;
+      gap: 3px;
+      margin-top: 12px;
+    }
+
+    .w-dot-wrap { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; }
+    .w-dot-lbl  { font-family: var(--font-mono); font-size: 7px; color: var(--text-dim); }
+    .w-dot {
+      width: 100%;
+      height: 24px;
+      border-radius: 3px;
+      background: rgba(88,144,224,0.07);
+      border: 1px solid rgba(88,144,224,0.1);
+      position: relative;
+      overflow: hidden;
+    }
+    .w-dot-fill {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: rgba(88,144,224,0.45);
+      transition: height 0.4s ease;
+    }
+    .w-dot.today .w-dot-fill { background: var(--accent-blue); }
+    .w-dot.full  .w-dot-fill { background: var(--accent-green); }
+
+    .water-calc-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .water-calc-row-2 {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .water-calc-label {
+      font-family: var(--font-mono);
+      font-size: 8px;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .water-target-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(88,144,224,0.07);
+      border: 1px solid rgba(88,144,224,0.2);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--accent-blue);
+    }
+
+    /* ============================================================
+       BUCKET LIST
+    ============================================================ */
+    .bucket-item {
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      transition: all 0.2s;
+    }
+
+    .bucket-item.reached { border-color: rgba(107,227,164,0.3); background: rgba(107,227,164,0.03); }
+
+    .bucket-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .bucket-name { flex: 1; font-size: 13px; color: var(--text-primary); font-weight: 500; }
+    .bucket-amount { font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary); }
+    .bucket-pct {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      font-weight: 700;
+      min-width: 50px;
+      text-align: right;
+    }
+
+    .bucket-bar-track {
+      width: 100%;
+      height: 4px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .bucket-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+      transition: width 0.6s ease;
+    }
+
+    .bucket-eta {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: var(--text-dim);
+      margin-top: 5px;
+    }
+
+    .bucket-del {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-size: 11px;
+      padding: 2px 5px;
+      flex-shrink: 0;
+    }
+    .bucket-del:hover { color: var(--accent-red); }
+
+    .add-bucket-row {
+      display: grid;
+      grid-template-columns: 1fr 120px auto;
+      gap: 6px;
+      margin-top: 14px;
+    }
+
+    /* ============================================================
+       AI COACH CARD
+    ============================================================ */
+    .coach-card {
+      background: rgba(242,192,99,0.04);
+      border: 1px solid rgba(242,192,99,0.12);
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .coach-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .coach-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: rgba(242,192,99,0.12);
+      border: 1px solid rgba(242,192,99,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .coach-title {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      color: var(--accent-amber);
+      text-transform: uppercase;
+    }
+
+    .coach-toggle {
+      margin-left: auto;
+      background: none;
+      border: none;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      letter-spacing: 0.06em;
+    }
+
+    .coach-insights {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .coach-insight {
+      font-family: var(--font-sans);
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      padding: 7px 10px;
+      background: rgba(255,255,255,0.02);
+      border-radius: 7px;
+      border-left: 2px solid transparent;
+    }
+
+    .coach-insight.info  { border-left-color: var(--accent-blue); }
+    .coach-insight.warn  { border-left-color: var(--accent-amber); color: rgba(242,192,99,0.9); }
+    .coach-insight.good  { border-left-color: var(--accent-green); }
+    .coach-insight.alert { border-left-color: var(--accent-red); }
+
+    /* ============================================================
+       DAY RANGE SETTINGS
+    ============================================================ */
+    .ring-settings {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      justify-content: center;
+    }
+
+    .ring-settings-lbl {
+      font-family: var(--font-mono);
+      font-size: 8px;
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
+    }
+
+    .ring-hour-input {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--card-border);
+      border-radius: 5px;
+      padding: 3px 6px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-secondary);
+      width: 42px;
+      text-align: center;
+      outline: none;
+    }
+
+    .ring-hour-input:focus { border-color: rgba(255,255,255,0.1); }
+
+    /* ============================================================
        BUTTON ACTIVE PRESS FEEDBACK (global)
     ============================================================ */
     button:active { transform: scale(0.97); }
@@ -1815,6 +2120,16 @@
 
   <!-- ── TAB 1: FOCUS & ENGINE ──────────────────────── -->
   <div class="tab-panel active" id="tab0">
+
+    <!-- AI Coach — Focus Tab -->
+    <div class="coach-card" id="coachFocus">
+      <div class="coach-header">
+        <div class="coach-avatar">⚡</div>
+        <div class="coach-title">Focus Coach</div>
+        <button class="coach-toggle" onclick="toggleCoach('coachFocus')">▾ HIDE</button>
+      </div>
+      <div class="coach-insights" id="coachFocusInsights"></div>
+    </div>
 
     <div class="led-ticker">
       <div class="led-dot"></div>
@@ -1920,6 +2235,13 @@
             <div class="ring-countdown" id="ringCdown">16h 0m left</div>
           </div>
         </div>
+        <div class="ring-settings">
+          <span class="ring-settings-lbl">WACH</span>
+          <input class="ring-hour-input" id="ringWakeH" type="number" min="0" max="12" value="8" onchange="saveRingSettings()" title="Aufwachzeit (h)"/>
+          <span class="ring-settings-lbl">→</span>
+          <input class="ring-hour-input" id="ringSleepH" type="number" min="18" max="27" value="24" onchange="saveRingSettings()" title="Schlafenszeit (h, 24=Mitternacht, 26=2 Uhr)"/>
+          <span class="ring-settings-lbl">UHR</span>
+        </div>
       </div>
 
       <!-- Todos -->
@@ -1966,6 +2288,74 @@
 
   <!-- ── TAB 2: HEALTH & PROGRESSION ───────────────── -->
   <div class="tab-panel" id="tab1">
+
+    <!-- AI Coach — Health Tab -->
+    <div class="coach-card" id="coachHealth">
+      <div class="coach-header">
+        <div class="coach-avatar">⚡</div>
+        <div class="coach-title">Health Coach</div>
+        <button class="coach-toggle" onclick="toggleCoach('coachHealth')">▾ HIDE</button>
+      </div>
+      <div class="coach-insights" id="coachHealthInsights"></div>
+    </div>
+
+    <!-- Water Smart Tracker -->
+    <div class="card" style="margin-bottom:24px;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px;">
+        <div>
+          <div class="card-label">HYDRATION PROTOCOL</div>
+          <div class="card-title" style="margin-bottom:0;">Wasser-Tracker</div>
+        </div>
+        <div class="water-target-badge" id="waterTargetBadge">Ziel: 2000 ml</div>
+      </div>
+
+      <div class="water-smart-meter">
+        <div>
+          <div class="water-smart-value" id="wSmartAmt">0</div>
+          <div class="water-smart-of" id="wSmartOf">von 2000 ml</div>
+        </div>
+        <div class="water-progress-track">
+          <div class="water-progress-fill" id="wSmartBar" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div class="water-btn-row">
+        <button class="water-add-btn" onclick="addWater(150)">+ 150 ml</button>
+        <button class="water-add-btn" onclick="addWater(250)">+ 250 ml</button>
+        <button class="water-add-btn" onclick="addWater(500)">+ 500 ml</button>
+        <button class="water-add-btn" onclick="addWater(-150)" style="opacity:0.6;">− 150 ml</button>
+      </div>
+
+      <div class="water-history-dots" id="wSmartHistory"></div>
+
+      <div class="divider" style="margin:16px 0 12px;"></div>
+      <div class="card-label" style="margin-bottom:8px;">ZIEL-KALKULATOR</div>
+      <div class="water-calc-row">
+        <div>
+          <div class="water-calc-label">Körpergewicht (kg)</div>
+          <input class="form-input" id="wcWeight" type="number" placeholder="70" value="" oninput="calcWaterTarget()"/>
+        </div>
+        <div>
+          <div class="water-calc-label">Aktivitätslevel</div>
+          <select class="form-select" id="wcActivity" onchange="calcWaterTarget()">
+            <option value="0">Sitzend</option>
+            <option value="300">Leicht aktiv</option>
+            <option value="600" selected>Moderat</option>
+            <option value="900">Intensiv</option>
+          </select>
+        </div>
+        <div>
+          <div class="water-calc-label">Koffein (mg/Tag)</div>
+          <input class="form-input" id="wcCaffeine" type="number" placeholder="100" value="" oninput="calcWaterTarget()"/>
+        </div>
+      </div>
+      <div class="water-calc-row-2">
+        <label style="display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:10px;color:var(--text-secondary);cursor:pointer;">
+          <input type="checkbox" id="wcAdhd" onchange="calcWaterTarget()" style="accent-color:var(--accent-amber);"/>
+          Stimulanzien (Concerta / Vyvanse) → +500 ml
+        </label>
+      </div>
+    </div>
 
     <!-- Habit Tracker (full-width above grid) -->
     <div class="card" style="margin-bottom:24px;">
@@ -2108,6 +2498,17 @@
 
   <!-- ── TAB 3: SCHULE ───────────────────────────────── -->
   <div class="tab-panel" id="tab2">
+
+    <!-- AI Coach — Schule Tab -->
+    <div class="coach-card" id="coachSchule">
+      <div class="coach-header">
+        <div class="coach-avatar">⚡</div>
+        <div class="coach-title">Schul-Coach</div>
+        <button class="coach-toggle" onclick="toggleCoach('coachSchule')">▾ HIDE</button>
+      </div>
+      <div class="coach-insights" id="coachSchuleInsights"></div>
+    </div>
+
     <div class="tab2-grid">
 
       <!-- Noten-Tracker -->
@@ -2272,7 +2673,29 @@
           </div>
         </div>
 
+        <!-- Bucket List -->
+        <div class="card">
+          <div class="card-label">ZIELE & TRÄUME</div>
+          <div class="card-title">Bucket List</div>
+          <div id="bucketList"></div>
+          <div class="add-bucket-row">
+            <input class="form-input" id="bktName" placeholder="Ziel (z.B. BMW M3)"/>
+            <input class="form-input" id="bktAmt"  type="number" step="100" placeholder="€ Zielpreis"/>
+            <button class="primary-btn" onclick="addBucketItem()" style="background:rgba(107,227,164,0.07);border-color:rgba(107,227,164,0.2);color:var(--accent-green);">+ ADD</button>
+          </div>
+        </div>
+
       </div>
+    </div>
+
+    <!-- AI Coach — Wealth Tab -->
+    <div class="coach-card" id="coachWealth" style="margin-top:24px;">
+      <div class="coach-header">
+        <div class="coach-avatar">⚡</div>
+        <div class="coach-title">Wealth Coach</div>
+        <button class="coach-toggle" onclick="toggleCoach('coachWealth')">▾ HIDE</button>
+      </div>
+      <div class="coach-insights" id="coachWealthInsights"></div>
     </div>
   </div>
 
@@ -2496,8 +2919,10 @@ function updateStatusDots() {
 function switchTab(i, btn) {
   document.querySelectorAll(".tab-panel").forEach((p,j) => p.classList.toggle("active", j===i));
   document.querySelectorAll(".tab-btn").forEach((b,j) => b.classList.toggle("active", j===i));
-  if (i===3) { renderPie(); renderAccounts(); }
-  if (i===2) { renderGrades(); renderExams(); renderHomework(); }
+  if (i===3) { renderPie(); renderAccounts(); renderBucketList(); renderCoach("coachWealth", buildWealthInsights()); }
+  if (i===2) { renderGrades(); renderExams(); renderHomework(); renderCoach("coachSchule", buildSchuleInsights()); }
+  if (i===1) { renderCoach("coachHealth", buildHealthInsights()); }
+  if (i===0) { renderCoach("coachFocus", buildFocusInsights()); }
 }
 
 /* ================================================================
@@ -2506,7 +2931,8 @@ function switchTab(i, btn) {
 function updateRing() {
   const now = new Date();
   const h = now.getHours(), m = now.getMinutes();
-  const WAKE_H = 8, SLEEP_H = 24;
+  const rs = typeof ringSettings !== "undefined" ? ringSettings : { wake:8, sleep:24 };
+  const WAKE_H = rs.wake, SLEEP_H = rs.sleep;
   const TOTAL = (SLEEP_H - WAKE_H) * 60;
   const elapsed = Math.max(0, (h - WAKE_H) * 60 + m);
   const pct = Math.min(100, Math.round(elapsed / TOTAL * 100));
@@ -2558,6 +2984,305 @@ function renderWater() {
   }
 }
 renderWater();
+
+/* ================================================================
+   WATER SMART TRACKER
+================================================================ */
+let waterSettings = lsGet("waterSettings", { weight: 70, activity: 600, caffeine: 100, adhd: true });
+let waterTarget = lsGet("waterTarget", 2500);
+
+function calcWaterTarget() {
+  const w  = parseFloat(document.getElementById("wcWeight").value)   || waterSettings.weight;
+  const a  = parseInt(document.getElementById("wcActivity").value)    || waterSettings.activity;
+  const c  = parseFloat(document.getElementById("wcCaffeine").value)  || waterSettings.caffeine;
+  const ad = document.getElementById("wcAdhd").checked;
+  waterSettings = { weight: w, activity: a, caffeine: c, adhd: ad };
+  lsSet("waterSettings", waterSettings);
+  let target = Math.round(w * 35 + a + (c * 1.5) + (ad ? 500 : 0));
+  target = Math.max(1500, Math.min(5000, target));
+  waterTarget = target;
+  lsSet("waterTarget", target);
+  renderWaterSmart();
+  toast("Wasserziel: " + target + " ml berechnet");
+}
+
+function addWater(ml) {
+  S.water = Math.max(0, S.water + ml);
+  lsSet("water_" + T, S.water);
+  S.waterH[T] = S.water;
+  lsSet("waterH", S.waterH);
+  renderWaterSmart();
+  updateStatusDots();
+  if (sb.ok() && ml > 0) sb.post("water_logs", { date_str: T, amount_ml: ml });
+}
+
+function renderWaterSmart() {
+  const amt = S.water;
+  const tgt = waterTarget || 2000;
+  const pct = Math.min(100, Math.round(amt / tgt * 100));
+
+  const amtEl = document.getElementById("wSmartAmt");
+  const ofEl  = document.getElementById("wSmartOf");
+  const barEl = document.getElementById("wSmartBar");
+  const badgeEl = document.getElementById("waterTargetBadge");
+  if (!amtEl) return;
+
+  amtEl.textContent = amt;
+  ofEl.textContent  = "von " + tgt + " ml";
+  barEl.style.width = pct + "%";
+  if (badgeEl) badgeEl.textContent = "Ziel: " + tgt + " ml";
+  amtEl.style.color = pct >= 100 ? "var(--accent-green)" : pct >= 60 ? "var(--accent-blue)" : "var(--accent-amber)";
+
+  // 14-day history
+  const hist = document.getElementById("wSmartHistory");
+  if (!hist) return;
+  hist.innerHTML = "";
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date(Date.now() - i*86400000).toISOString().split("T")[0];
+    const dayAmt = i === 0 ? S.water : (S.waterH[d] || 0);
+    const dayPct = Math.min(100, Math.round(dayAmt / tgt * 100));
+    const wrap = document.createElement("div");
+    wrap.className = "w-dot-wrap";
+    const lbl = document.createElement("div");
+    lbl.className = "w-dot-lbl";
+    lbl.textContent = new Date(d + "T12:00:00").toLocaleDateString("de-DE",{weekday:"narrow"});
+    const dot = document.createElement("div");
+    dot.className = "w-dot" + (i===0?" today":"") + (dayPct>=100?" full":"");
+    const fill = document.createElement("div");
+    fill.className = "w-dot-fill";
+    fill.style.height = dayPct + "%";
+    dot.appendChild(fill);
+    wrap.appendChild(lbl);
+    wrap.appendChild(dot);
+    hist.appendChild(wrap);
+  }
+}
+
+function initWaterCalcUI() {
+  const ws = waterSettings;
+  const wEl = document.getElementById("wcWeight");
+  const aEl = document.getElementById("wcActivity");
+  const cEl = document.getElementById("wcCaffeine");
+  const dEl = document.getElementById("wcAdhd");
+  if (wEl) wEl.value = ws.weight || 70;
+  if (aEl) aEl.value = ws.activity || 600;
+  if (cEl) cEl.value = ws.caffeine || 100;
+  if (dEl) dEl.checked = ws.adhd !== false;
+}
+initWaterCalcUI();
+renderWaterSmart();
+
+/* ================================================================
+   RING SETTINGS (Day Range)
+================================================================ */
+let ringSettings = lsGet("ringSettings", { wake: 8, sleep: 24 });
+
+function saveRingSettings() {
+  const w = parseInt(document.getElementById("ringWakeH").value) || 8;
+  const s = parseInt(document.getElementById("ringSleepH").value) || 24;
+  ringSettings = { wake: Math.max(0,Math.min(12,w)), sleep: Math.max(18,Math.min(27,s)) };
+  lsSet("ringSettings", ringSettings);
+  updateRing();
+}
+
+function initRingUI() {
+  const wEl = document.getElementById("ringWakeH");
+  const sEl = document.getElementById("ringSleepH");
+  if (wEl) wEl.value = ringSettings.wake;
+  if (sEl) sEl.value = ringSettings.sleep;
+}
+initRingUI();
+
+/* ================================================================
+   AI COACH
+================================================================ */
+let coachCollapsed = lsGet("coachCollapsed", {});
+
+function toggleCoach(id) {
+  coachCollapsed[id] = !coachCollapsed[id];
+  lsSet("coachCollapsed", coachCollapsed);
+  const el = document.getElementById(id);
+  if (!el) return;
+  const btn  = el.querySelector(".coach-toggle");
+  const body = el.querySelector(".coach-insights");
+  if (coachCollapsed[id]) {
+    body.style.display = "none";
+    btn.textContent = "▸ SHOW";
+  } else {
+    body.style.display = "flex";
+    btn.textContent = "▾ HIDE";
+    renderAllCoach();
+  }
+}
+
+function coachInsight(text, type = "info") {
+  return `<div class="coach-insight ${type}">${text}</div>`;
+}
+
+function renderCoach(id, insights) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const body = el.querySelector(".coach-insights");
+  if (!body) return;
+  if (coachCollapsed[id]) { body.style.display = "none"; return; }
+  body.innerHTML = insights.join("") || coachInsight("Alles im grünen Bereich. Mach weiter so.", "good");
+}
+
+function buildFocusInsights() {
+  const now = new Date();
+  const h   = now.getHours();
+  const done  = S.todos.filter(t => t.done).length;
+  const total = S.todos.length;
+  const remaining = total - done;
+  const ins = [];
+  if (total === 0) ins.push(coachInsight("Noch keine Ziele für heute. Setz dir 2–3 konkrete Aufgaben, bevor du anfängst.", "warn"));
+  else if (done === total) ins.push(coachInsight("Alle " + total + " Ziele erledigt. Starker Tag — nutze den Rest für Deep Work oder plane morgen vor.", "good"));
+  else {
+    if (h >= 15 && remaining > 2) ins.push(coachInsight("⏰ Es ist " + h + " Uhr und du hast noch " + remaining + " Aufgaben offen. Priorisiere die wichtigste — den Rest pushe auf morgen.", "warn"));
+    else if (h >= 12 && remaining > 0) ins.push(coachInsight(remaining + " Aufgabe" + (remaining===1?"":"n") + " übrig. Nachmittags-Focus-Block starten?", "info"));
+    else if (remaining > 0) ins.push(coachInsight("Noch " + remaining + " Task" + (remaining===1?"":"s") + " heute. Fang mit der schwersten an — Eat the frog.", "info"));
+  }
+  if (S.streak >= 7) ins.push(coachInsight("🔥 " + S.streak + "-Tage-Streak. Nicht jetzt brechen.", "good"));
+  const ses = focusState ? focusState.sessions : 0;
+  if (ses >= 4) ins.push(coachInsight(ses + " Focus-Sessions heute. Exzellente Disziplin.", "good"));
+  else if (ses >= 1) ins.push(coachInsight(ses + " Focus-Session" + (ses===1?"":"s") + " heute. Noch " + (4-ses) + " für ein vollständiges Protokoll.", "info"));
+  return ins;
+}
+
+function buildHealthInsights() {
+  const hl = typeof healthToday !== "undefined" ? healthToday : null;
+  const ins = [];
+  if (!hl) { ins.push(coachInsight("Keine Vitaldaten für heute. Sync über iOS Shortcut oder manuell eintragen.", "warn")); return ins; }
+  if (hl.sleep_hours && hl.sleep_hours < 6) ins.push(coachInsight("⚠ Nur " + hl.sleep_hours + "h Schlaf. Kognitive Leistung um ~20% reduziert. Heute früher ins Bett.", "alert"));
+  else if (hl.sleep_hours && hl.sleep_hours < 7) ins.push(coachInsight(hl.sleep_hours + "h Schlaf. Knapp — versuche heute früher schlafen zu gehen.", "warn"));
+  else if (hl.sleep_hours) ins.push(coachInsight(hl.sleep_hours + "h Schlaf. Gut erholt.", "good"));
+  if (hl.steps) {
+    if (hl.steps < 3000) ins.push(coachInsight("Nur " + hl.steps.toLocaleString("de-DE") + " Schritte. Ein 20-Min-Spaziergang würde Fokus und NEAT-Verbrauch steigern.", "warn"));
+    else if (hl.steps >= 10000) ins.push(coachInsight(hl.steps.toLocaleString("de-DE") + " Schritte. Bewegungsziel erreicht.", "good"));
+  }
+  const waterPct = Math.round(S.water / (waterTarget||2000) * 100);
+  if (waterPct < 50) ins.push(coachInsight("Nur " + waterPct + "% Wasserziel erreicht. Besonders wichtig bei Concerta/Vyvanse.", "alert"));
+  else if (waterPct >= 100) ins.push(coachInsight("Hydration-Ziel erreicht. 💧", "good"));
+  if (hl.hrv && hl.hrv < 40) ins.push(coachInsight("Niedrige HRV (" + hl.hrv + " ms) — Körper erholt sich noch. Heute lieber Ausdauer statt Intensität.", "warn"));
+  return ins;
+}
+
+function buildSchuleInsights() {
+  const examList = typeof exams !== "undefined" ? exams : [];
+  const hwList   = typeof homework !== "undefined" ? homework : [];
+  const gradesList = typeof grades !== "undefined" ? grades : [];
+  const ins = [];
+  examList.forEach(e => {
+    const diff = Math.ceil((new Date(e.exam_date) - new Date(T)) / 86400000);
+    if (diff < 0) return;
+    if (diff <= 1) ins.push(coachInsight("🚨 " + e.subject + " — Prüfung morgen! Letzte Wiederholung, nicht mehr viel Neues lernen.", "alert"));
+    else if (diff <= 3) ins.push(coachInsight("⚠ " + e.subject + " in " + diff + " Tagen. Fokus auf Altfragen und schwache Kapitel.", "warn"));
+    else if (diff <= 7) ins.push(coachInsight(e.subject + " in " + diff + " Tagen. Lernplan aufsetzen und täglich 45 min einplanen.", "info"));
+  });
+  const todayHw = hwList.filter(h => !h.done && h.due_date === T);
+  if (todayHw.length > 0) ins.push(coachInsight("📌 Heute fällig: " + todayHw.map(h=>h.task).join(", "), "warn"));
+  if (gradesList.length > 0) {
+    const avgData = (() => {
+      let sw = 0, swv = 0;
+      gradesList.forEach(g => { sw += (g.weight||1); swv += g.value * (g.weight||1); });
+      return sw ? (swv/sw) : null;
+    })();
+    if (avgData !== null && avgData > 3.5) ins.push(coachInsight("Notenschnitt " + avgData.toFixed(2) + ". Welches Fach zieht den Schnitt runter? Da maximal Ressourcen investieren.", "warn"));
+    else if (avgData !== null && avgData <= 2.5) ins.push(coachInsight("Notenschnitt " + avgData.toFixed(2) + ". Starke Leistung.", "good"));
+  }
+  return ins;
+}
+
+function buildWealthInsights() {
+  const nw = netWorth();
+  const ins = [];
+  if (nw === 0) { ins.push(coachInsight("Füge deine Konten hinzu, um deinen Nettowert zu tracken.", "info")); return ins; }
+  const nwHist = lsGet("nw_history", {});
+  const yesterday = new Date(Date.now()-86400000).toISOString().split("T")[0];
+  if (nwHist[yesterday] !== undefined) {
+    const diff = nw - nwHist[yesterday];
+    if (diff > 0) ins.push(coachInsight("Nettowert gestern: +" + fmt(diff) + ". Auf Kurs bleiben.", "good"));
+    else if (diff < 0) ins.push(coachInsight("Nettowert gestern: " + fmt(diff) + ". Prüfe ob das eine Ausgabe war oder Marktschwankung.", "warn"));
+  }
+  const bucketItems = lsGet("bucketList", []);
+  bucketItems.forEach(b => {
+    const pct = Math.min(100, Math.round(nw / b.amount * 100));
+    if (pct >= 100) ins.push(coachInsight("🎯 Du könntest dir '" + b.name + "' jetzt leisten (" + pct + "% des Ziels). Bewusste Entscheidung treffen.", "good"));
+    else if (pct >= 75) ins.push(coachInsight(pct + "% von '" + b.name + "' erreicht (" + fmt(nw) + " von " + fmt(b.amount) + "). Noch " + fmt(b.amount - nw) + " weg.", "info"));
+  });
+  const subs = S.subs || [];
+  const today = parseInt(T.split("-")[2]);
+  const soonSubs = subs.filter(s => { const diff = s.renewal_day - today; return diff >= 0 && diff <= 5; });
+  if (soonSubs.length > 0) ins.push(coachInsight("📅 Bald fällig: " + soonSubs.map(s=>s.name+" ("+fmt(s.amount)+")").join(", "), "warn"));
+  return ins;
+}
+
+function renderAllCoach() {
+  renderCoach("coachFocus",  buildFocusInsights());
+  renderCoach("coachHealth", buildHealthInsights());
+  renderCoach("coachSchule", buildSchuleInsights());
+  renderCoach("coachWealth", buildWealthInsights());
+}
+
+renderAllCoach();
+setInterval(renderAllCoach, 60000);
+
+/* ================================================================
+   BUCKET LIST
+================================================================ */
+let bucketList = lsGet("bucketList", []);
+
+function addBucketItem() {
+  const name = document.getElementById("bktName").value.trim();
+  const amt  = parseFloat(document.getElementById("bktAmt").value);
+  if (!name || isNaN(amt) || amt <= 0) { toast("Name und Betrag eingeben"); return; }
+  bucketList.push({ id: genId(), name, amount: amt });
+  lsSet("bucketList", bucketList);
+  document.getElementById("bktName").value = "";
+  document.getElementById("bktAmt").value  = "";
+  renderBucketList();
+  renderAllCoach();
+}
+
+function deleteBucketItem(id) {
+  bucketList = bucketList.filter(b => b.id !== id);
+  lsSet("bucketList", bucketList);
+  renderBucketList();
+}
+
+function renderBucketList() {
+  const nw  = netWorth();
+  const el  = document.getElementById("bucketList");
+  if (!el) return;
+  el.innerHTML = "";
+  if (!bucketList.length) {
+    el.innerHTML = '<div style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);padding:8px 0;">Füge ein Ziel hinzu (z.B. BMW M3, Reise, Wohnung…)</div>';
+    return;
+  }
+  bucketList.sort((a,b) => {
+    const pa = Math.min(100, nw/a.amount*100);
+    const pb = Math.min(100, nw/b.amount*100);
+    return pb - pa;
+  });
+  bucketList.forEach(b => {
+    const pct  = Math.min(100, Math.round(nw / b.amount * 100));
+    const left = Math.max(0, b.amount - nw);
+    const div  = document.createElement("div");
+    div.className = "bucket-item" + (pct >= 100 ? " reached" : "");
+    const pctColor = pct >= 100 ? "var(--accent-green)" : pct >= 60 ? "var(--accent-blue)" : "var(--text-secondary)";
+    div.innerHTML =
+      '<div class="bucket-top">' +
+        '<span class="bucket-name">' + esc(b.name) + '</span>' +
+        '<span class="bucket-amount">' + fmt(b.amount) + '</span>' +
+        '<span class="bucket-pct" style="color:' + pctColor + '">' + pct + '%</span>' +
+        '<button class="bucket-del" onclick="deleteBucketItem(\'' + esc(b.id) + '\')">✕</button>' +
+      '</div>' +
+      '<div class="bucket-bar-track"><div class="bucket-bar-fill" style="width:' + pct + '%"></div></div>' +
+      '<div class="bucket-eta">' + (pct >= 100 ? '✓ Erreichbar — bewusste Entscheidung treffen' : 'Noch ' + fmt(left) + ' bis zum Ziel · ' + pct + '% von ' + fmt(b.amount)) + '</div>';
+    el.appendChild(div);
+  });
+}
+renderBucketList();
 
 /* ================================================================
    LED TICKER
@@ -3086,6 +3811,8 @@ function updateNW() {
   document.getElementById("atlVal").textContent = fmt(S.atl || 0);
   snapshotNw(nw);
   drawNwSpark();
+  renderBucketList();
+  renderCoach("coachWealth", buildWealthInsights());
 }
 
 function renderAccounts() {
