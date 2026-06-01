@@ -2100,6 +2100,111 @@
     .execute-btn:active,
     .workout-done-btn:active { transform: scale(0.97); }
 
+    /* ============================================================
+       CLAUDE AI INTEGRATION
+    ============================================================ */
+    .api-key-pill {
+      cursor: pointer;
+      color: var(--text-tertiary);
+      transition: color 0.15s;
+      border: none;
+      background: none;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      padding: 6px 14px;
+      border-left: 1px solid var(--card-border);
+    }
+    .api-key-pill:hover { color: var(--accent-amber); }
+    .api-key-pill.has-key { color: var(--accent-green); }
+
+    .coach-refresh-btn {
+      background: none;
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      padding: 3px 8px;
+      letter-spacing: 0.06em;
+      transition: all 0.15s;
+      margin-left: 6px;
+    }
+    .coach-refresh-btn:hover { border-color: var(--accent-amber); color: var(--accent-amber); }
+    .coach-refresh-btn:disabled { opacity: 0.4; pointer-events: none; }
+
+    .coach-insight.ai { border-left-color: var(--accent-purple); color: var(--text-primary); }
+
+    /* ============================================================
+       BRAIN DUMP ENTRIES
+    ============================================================ */
+    .braindump-save-btn {
+      background: rgba(107,227,164,0.06);
+      border: 1px solid rgba(107,227,164,0.2);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: var(--accent-green);
+      cursor: pointer;
+      letter-spacing: 0.08em;
+      transition: all 0.15s;
+    }
+    .braindump-save-btn:hover { background: rgba(107,227,164,0.12); }
+
+    .braindump-entries {
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 320px;
+      overflow-y: auto;
+    }
+    .braindump-entries-header {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+      margin-bottom: 2px;
+    }
+    .braindump-entry {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+    .braindump-entry-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+    .braindump-entry-ts {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: var(--text-dim);
+      letter-spacing: 0.06em;
+    }
+    .braindump-entry-del {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-size: 12px;
+      padding: 0;
+      line-height: 1;
+      transition: color 0.15s;
+    }
+    .braindump-entry-del:hover { color: var(--accent-red); }
+    .braindump-entry-text {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
   </style>
 </head>
 <body>
@@ -2114,6 +2219,7 @@
         <div class="stat-pill goals" id="goalsPill">GOALS: 0/0 Done</div>
         <div class="stat-pill" id="streakHeaderPill" style="display:none;">⚡ <span id="streakHeaderNum">0</span> DAY STREAK</div>
         <div class="stat-pill" id="healthHeaderPill" style="display:none;" title="Kalorien heute"></div>
+        <button class="api-key-pill" id="apiKeyPill" onclick="setApiKey()" title="Claude API Key">⚙ AI</button>
       </div>
     </div>
 
@@ -2133,6 +2239,7 @@
       <div class="coach-header">
         <div class="coach-avatar">⚡</div>
         <div class="coach-title">Focus Coach</div>
+        <button class="coach-refresh-btn" id="refreshFocus" onclick="refreshCoach('coachFocus','focus')">↻ AI</button>
         <button class="coach-toggle" onclick="toggleCoach('coachFocus')">▾ HIDE</button>
       </div>
       <div class="coach-insights" id="coachFocusInsights"></div>
@@ -2211,8 +2318,10 @@
       <textarea class="braindump-textarea" id="brainDumpText" placeholder="Dump every thought here — ideas, worries, to-revisit…" oninput="onBrainDump()"></textarea>
       <div class="braindump-footer">
         <span class="braindump-meta" id="brainDumpMeta">0 chars · unsaved</span>
+        <button class="braindump-save-btn" onclick="saveBrainDumpEntry()">SAVE ENTRY</button>
         <button class="braindump-clear" onclick="clearBrainDump()">CLEAR</button>
       </div>
+      <div id="brainDumpEntries"></div>
     </div>
 
     <div class="tab1-grid">
@@ -2301,6 +2410,7 @@
       <div class="coach-header">
         <div class="coach-avatar">⚡</div>
         <div class="coach-title">Health Coach</div>
+        <button class="coach-refresh-btn" id="refreshHealth" onclick="refreshCoach('coachHealth','health')">↻ AI</button>
         <button class="coach-toggle" onclick="toggleCoach('coachHealth')">▾ HIDE</button>
       </div>
       <div class="coach-insights" id="coachHealthInsights"></div>
@@ -2537,6 +2647,7 @@
       <div class="coach-header">
         <div class="coach-avatar">⚡</div>
         <div class="coach-title">Schul-Coach</div>
+        <button class="coach-refresh-btn" id="refreshSchule" onclick="refreshCoach('coachSchule','schule')">↻ AI</button>
         <button class="coach-toggle" onclick="toggleCoach('coachSchule')">▾ HIDE</button>
       </div>
       <div class="coach-insights" id="coachSchuleInsights"></div>
@@ -2726,6 +2837,7 @@
       <div class="coach-header">
         <div class="coach-avatar">⚡</div>
         <div class="coach-title">Wealth Coach</div>
+        <button class="coach-refresh-btn" id="refreshWealth" onclick="refreshCoach('coachWealth','wealth')">↻ AI</button>
         <button class="coach-toggle" onclick="toggleCoach('coachWealth')">▾ HIDE</button>
       </div>
       <div class="coach-insights" id="coachWealthInsights"></div>
@@ -3106,7 +3218,156 @@ function initRingUI() {
 initRingUI();
 
 /* ================================================================
-   AI COACH
+   CLAUDE AI INTEGRATION
+================================================================ */
+let claudeApiKey = lsGet("claude_api_key", "");
+const coachAiCache = {};
+
+function updateApiKeyPill() {
+  const btn = document.getElementById("apiKeyPill");
+  if (!btn) return;
+  if (claudeApiKey) {
+    btn.textContent = "⚡ AI ON";
+    btn.classList.add("has-key");
+  } else {
+    btn.textContent = "⚙ AI";
+    btn.classList.remove("has-key");
+  }
+}
+updateApiKeyPill();
+
+function setApiKey() {
+  const current = claudeApiKey ? "sk-ant-***gesetzt***" : "";
+  const key = prompt("Claude API Key eingeben (leer = entfernen):", current);
+  if (key === null) return;
+  claudeApiKey = key.trim().replace(/^sk-ant-\*+\*+$/, claudeApiKey);
+  lsSet("claude_api_key", claudeApiKey);
+  updateApiKeyPill();
+  toast(claudeApiKey ? "Claude API Key gesetzt ✓" : "API Key entfernt");
+}
+
+async function callClaudeApi(userMessage) {
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "x-api-key": claudeApiKey,
+      "anthropic-version": "2023-06-01",
+      "content-type": "application/json",
+      "anthropic-dangerous-direct-browser-access": "true"
+    },
+    body: JSON.stringify({
+      model: "claude-haiku-4-5-20251001",
+      max_tokens: 350,
+      system: "Du bist Felix' persönlicher Life-OS Coach. Felix ist 14 Jahre alt, Gymnasiast in Bayern, trainiert regelmäßig, hat ADHS und nimmt Concerta. Antworte immer auf Deutsch. Gib genau 2-3 kurze, direkte, personalisierte Coaching-Insights. Pro Insight max 2 Sätze. Kein Markdown, keine Aufzählungszeichen, keine Nummerierung. Trenne Insights durch Zeilenumbrüche. Sei konkret, ehrlich und motivierend.",
+      messages: [{ role: "user", content: userMessage }]
+    })
+  });
+  if (!res.ok) {
+    const e = await res.json().catch(() => ({}));
+    throw new Error(e.error?.message || "HTTP " + res.status);
+  }
+  const data = await res.json();
+  return data.content[0].text.trim();
+}
+
+function buildCoachContext(type) {
+  const now = new Date();
+  const h = now.getHours();
+  const min = String(now.getMinutes()).padStart(2, "0");
+  const done = S.todos.filter(t => t.done).length;
+  const total = S.todos.length;
+
+  if (type === "focus") {
+    const ses = typeof focusState !== "undefined" ? focusState.sessions : 0;
+    const openTasks = S.todos.filter(t => !t.done).map(t => t.text).join(", ") || "keine";
+    return `Uhrzeit: ${h}:${min}, Datum: ${T}
+Todos: ${done}/${total} erledigt — offene Tasks: ${openTasks}
+Streak: ${S.streak} Tage
+Focus-Sessions heute: ${ses}
+Analysiere meinen Focus-Status und gib mir 2-3 konkrete Coaching-Insights für den Rest des Tages.`;
+  }
+
+  if (type === "health") {
+    const hl = typeof healthToday !== "undefined" ? healthToday : null;
+    const w = (S.weights && S.weights.length) ? S.weights[S.weights.length - 1].kg + " kg" : "nicht eingetragen";
+    const waterPct = Math.round((S.water || 0) / (typeof waterTarget !== "undefined" ? waterTarget : 2000) * 100);
+    return `Datum: ${T}, Uhrzeit: ${h} Uhr
+${hl ? `Schlaf: ${hl.sleep_hours ?? "?"}h | Schritte: ${hl.steps ?? "?"} | Kalorien: ${hl.calories_in ?? "?"} kcal | HRV: ${hl.hrv ?? "?"} ms | Aktive Min: ${hl.active_minutes ?? "?"}` : "Keine Apple Health Daten heute"}
+Wasser: ${S.water || 0} ml (${waterPct}% vom Ziel)
+Gewicht: ${w}
+Analysiere meinen Health-Status und gib mir 2-3 konkrete Coaching-Insights.`;
+  }
+
+  if (type === "schule") {
+    const examList = typeof exams !== "undefined" ? exams : [];
+    const hwList = typeof homework !== "undefined" ? homework : [];
+    const gradesList = typeof grades !== "undefined" ? grades : [];
+    let avg = null;
+    if (gradesList.length) {
+      let sw = 0, swv = 0;
+      gradesList.forEach(g => { sw += (g.weight || 1); swv += g.value * (g.weight || 1); });
+      avg = sw ? (swv / sw).toFixed(2) : null;
+    }
+    const upExams = examList.map(e => {
+      const d = Math.ceil((new Date(e.exam_date) - new Date(T)) / 86400000);
+      return d >= 0 ? `${e.subject} in ${d}d` : null;
+    }).filter(Boolean).join(", ") || "keine";
+    const todayHw = hwList.filter(h2 => !h2.done && h2.due_date === T).map(h2 => h2.task).join(", ") || "keine";
+    return `Datum: ${T}
+Notenschnitt: ${avg ?? "keine Noten eingetragen"}
+Kommende Prüfungen: ${upExams}
+Hausaufgaben heute fällig: ${todayHw}
+Analysiere meinen Schul-Status und gib mir 2-3 konkrete Coaching-Insights.`;
+  }
+
+  if (type === "wealth") {
+    const nw = typeof netWorth === "function" ? netWorth() : 0;
+    const accs = (S.accounts || []).map(a => `${a.name} €${a.balance}`).join(", ") || "keine";
+    const subsTotal = (S.subs || []).reduce((a, s) => a + (s.amount || 0), 0);
+    const bucket = lsGet("bucketList", []).map(b => `${b.name} (€${b.amount})`).join(", ") || "keine";
+    return `Datum: ${T}
+Nettowert: €${nw.toFixed(2)}
+Konten: ${accs}
+Monatliche Abos: €${subsTotal.toFixed(2)}
+Bucket-List-Ziele: ${bucket}
+Analysiere meinen Wealth-Status und gib mir 2-3 konkrete Coaching-Insights.`;
+  }
+  return "";
+}
+
+async function refreshCoach(id, type) {
+  if (!claudeApiKey) {
+    toast("Claude API Key setzen — klick auf ⚙ AI im Header");
+    return;
+  }
+  const refreshBtn = document.getElementById("refresh" + type.charAt(0).toUpperCase() + type.slice(1));
+  if (refreshBtn) { refreshBtn.textContent = "↻ …"; refreshBtn.disabled = true; }
+
+  const el = document.getElementById(id);
+  if (!el) return;
+  const body = el.querySelector(".coach-insights");
+  if (body) {
+    body.style.display = "flex";
+    body.innerHTML = `<div class="coach-insight info" style="opacity:0.55;font-style:italic;">Claude denkt nach…</div>`;
+  }
+  if (coachCollapsed[id]) { coachCollapsed[id] = false; lsSet("coachCollapsed", coachCollapsed); }
+
+  try {
+    const text = await callClaudeApi(buildCoachContext(type));
+    const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
+    const html = lines.map(l => `<div class="coach-insight ai">${esc(l)}</div>`).join("");
+    if (body) body.innerHTML = html;
+    coachAiCache[id] = { html, ts: Date.now() };
+  } catch (e) {
+    if (body) body.innerHTML = `<div class="coach-insight alert">Claude API Fehler: ${esc(e.message)}</div>`;
+    toast("API Fehler — prüfe Key und Netz");
+  } finally {
+    if (refreshBtn) { refreshBtn.textContent = "↻ AI"; refreshBtn.disabled = false; }
+  }
+}
+
+/* ================================================================
+   AI COACH (Rule-Based Fallback)
 ================================================================ */
 let coachCollapsed = lsGet("coachCollapsed", {});
 
@@ -3117,13 +3378,16 @@ function toggleCoach(id) {
   if (!el) return;
   const btn  = el.querySelector(".coach-toggle");
   const body = el.querySelector(".coach-insights");
+  if (!btn || !body) return;
   if (coachCollapsed[id]) {
     body.style.display = "none";
     btn.textContent = "▸ SHOW";
   } else {
     body.style.display = "flex";
     btn.textContent = "▾ HIDE";
-    renderAllCoach();
+    const cached = coachAiCache[id];
+    if (cached) body.innerHTML = cached.html;
+    else renderAllCoach();
   }
 }
 
@@ -3132,11 +3396,13 @@ function coachInsight(text, type = "info") {
 }
 
 function renderCoach(id, insights) {
+  if (coachAiCache[id]) return;
   const el = document.getElementById(id);
   if (!el) return;
   const body = el.querySelector(".coach-insights");
   if (!body) return;
   if (coachCollapsed[id]) { body.style.display = "none"; return; }
+  body.style.display = "flex";
   body.innerHTML = insights.join("") || coachInsight("Alles im grünen Bereich. Mach weiter so.", "good");
 }
 
@@ -3172,8 +3438,8 @@ function buildHealthInsights() {
     if (hl.steps < 3000) ins.push(coachInsight("Nur " + hl.steps.toLocaleString("de-DE") + " Schritte. Ein 20-Min-Spaziergang würde Fokus und NEAT-Verbrauch steigern.", "warn"));
     else if (hl.steps >= 10000) ins.push(coachInsight(hl.steps.toLocaleString("de-DE") + " Schritte. Bewegungsziel erreicht.", "good"));
   }
-  const waterPct = Math.round(S.water / (waterTarget||2000) * 100);
-  if (waterPct < 50) ins.push(coachInsight("Nur " + waterPct + "% Wasserziel erreicht. Besonders wichtig bei Concerta/Vyvanse.", "alert"));
+  const waterPct = Math.round(S.water / (typeof waterTarget !== "undefined" ? waterTarget : 2000) * 100);
+  if (waterPct < 50) ins.push(coachInsight("Nur " + waterPct + "% Wasserziel erreicht. Besonders wichtig bei Concerta.", "alert"));
   else if (waterPct >= 100) ins.push(coachInsight("Hydration-Ziel erreicht. 💧", "good"));
   if (hl.hrv && hl.hrv < 40) ins.push(coachInsight("Niedrige HRV (" + hl.hrv + " ms) — Körper erholt sich noch. Heute lieber Ausdauer statt Intensität.", "warn"));
   return ins;
@@ -3206,7 +3472,7 @@ function buildSchuleInsights() {
 }
 
 function buildWealthInsights() {
-  const nw = netWorth();
+  const nw = typeof netWorth === "function" ? netWorth() : 0;
   const ins = [];
   if (nw === 0) { ins.push(coachInsight("Füge deine Konten hinzu, um deinen Nettowert zu tracken.", "info")); return ins; }
   const nwHist = lsGet("nw_history", {});
@@ -4630,39 +4896,92 @@ setInterval(checkReflectionVisibility, 60000);
    BRAIN DUMP
 ================================================================ */
 let brainDumpTimer = null;
+let brainDumpEntries = lsGet("brain_dump_entries", []);
 
 (function initBrainDump() {
   const saved = lsGet("brain_dump", "");
   const ta = document.getElementById("brainDumpText");
   if (ta) { ta.value = saved; updateBrainDumpMeta(saved); }
+  renderBrainDumpEntries();
 })();
 
 function onBrainDump() {
   const ta = document.getElementById("brainDumpText");
   const val = ta.value;
-  document.getElementById("brainDumpMeta").textContent = val.length + " chars · saving…";
+  document.getElementById("brainDumpMeta").textContent = val.length + " chars · draft";
   clearTimeout(brainDumpTimer);
-  brainDumpTimer = setTimeout(() => {
-    lsSet("brain_dump", val);
-    const now = new Date();
-    const ts = now.getHours().toString().padStart(2,"0") + ":" + now.getMinutes().toString().padStart(2,"0");
-    document.getElementById("brainDumpMeta").textContent = val.length + " chars · saved " + ts;
-  }, 500);
+  brainDumpTimer = setTimeout(() => { lsSet("brain_dump", val); }, 600);
 }
 
 function updateBrainDumpMeta(val) {
   const el = document.getElementById("brainDumpMeta");
   if (!el) return;
-  el.textContent = val.length + " chars · loaded";
+  el.textContent = val.length ? val.length + " chars · draft" : "0 chars";
+}
+
+function saveBrainDumpEntry() {
+  const ta = document.getElementById("brainDumpText");
+  const val = ta.value.trim();
+  if (!val) { toast("Nichts zu speichern"); return; }
+  const now = new Date();
+  brainDumpEntries.push({
+    text: val,
+    date: T,
+    time: now.getHours().toString().padStart(2,"0") + ":" + now.getMinutes().toString().padStart(2,"0"),
+    id: Date.now()
+  });
+  lsSet("brain_dump_entries", brainDumpEntries);
+  ta.value = "";
+  lsSet("brain_dump", "");
+  document.getElementById("brainDumpMeta").textContent = "0 chars";
+  renderBrainDumpEntries();
+  toast("Eintrag gespeichert");
+}
+
+function deleteBrainEntry(id) {
+  brainDumpEntries = brainDumpEntries.filter(e => e.id !== id);
+  lsSet("brain_dump_entries", brainDumpEntries);
+  renderBrainDumpEntries();
+}
+
+function renderBrainDumpEntries() {
+  const container = document.getElementById("brainDumpEntries");
+  if (!container) return;
+  if (!brainDumpEntries.length) { container.textContent = ""; return; }
+  container.textContent = "";
+  const hdr = document.createElement("div");
+  hdr.className = "braindump-entries-header";
+  hdr.textContent = "GESPEICHERTE EINTRÄGE — " + brainDumpEntries.length;
+  container.appendChild(hdr);
+  brainDumpEntries.slice().reverse().forEach(entry => {
+    const wrap = document.createElement("div");
+    wrap.className = "braindump-entry";
+    const meta = document.createElement("div");
+    meta.className = "braindump-entry-meta";
+    const ts = document.createElement("span");
+    ts.className = "braindump-entry-ts";
+    ts.textContent = entry.date + " · " + entry.time;
+    const del = document.createElement("button");
+    del.className = "braindump-entry-del";
+    del.textContent = "✕";
+    del.onclick = () => deleteBrainEntry(entry.id);
+    meta.appendChild(ts);
+    meta.appendChild(del);
+    const txt = document.createElement("div");
+    txt.className = "braindump-entry-text";
+    txt.textContent = entry.text;
+    wrap.appendChild(meta);
+    wrap.appendChild(txt);
+    container.appendChild(wrap);
+  });
 }
 
 function clearBrainDump() {
-  if (!confirm("Clear brain dump? This cannot be undone.")) return;
   const ta = document.getElementById("brainDumpText");
+  if (!ta.value.trim()) { toast("Draft bereits leer"); return; }
   ta.value = "";
   lsSet("brain_dump", "");
-  document.getElementById("brainDumpMeta").textContent = "0 chars · cleared";
-  toast("Brain dump cleared");
+  document.getElementById("brainDumpMeta").textContent = "0 chars";
 }
 
 /* ================================================================
