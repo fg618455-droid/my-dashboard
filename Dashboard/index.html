@@ -2375,6 +2375,152 @@
       align-items: center;
     }
 
+    /* ============================================================
+       CHAT
+    ============================================================ */
+    #chatFab {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--accent-amber);
+      color: #040405;
+      border: none;
+      font-size: 22px;
+      cursor: pointer;
+      z-index: 200;
+      box-shadow: 0 4px 24px rgba(242,192,99,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s var(--spring), background 0.2s;
+    }
+    #chatFab:hover { transform: scale(1.1); }
+    #chatFab.open { background: #2a2a2e; color: var(--text-tertiary); }
+
+    #chatPanel {
+      position: fixed;
+      bottom: 88px;
+      right: 24px;
+      width: 360px;
+      max-width: calc(100vw - 32px);
+      height: 500px;
+      max-height: calc(100vh - 130px);
+      background: #0c0c0e;
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      z-index: 199;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+      transform: scale(0.92) translateY(12px);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.25s var(--spring), opacity 0.18s ease;
+    }
+    #chatPanel.open {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+      pointer-events: all;
+    }
+    #chatPanelHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--card-border);
+      flex-shrink: 0;
+    }
+    #chatPanelHeader span {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--text-tertiary);
+    }
+    #chatPanelHeader button {
+      background: none;
+      border: none;
+      color: var(--text-tertiary);
+      font-size: 15px;
+      cursor: pointer;
+      padding: 2px 4px;
+      line-height: 1;
+    }
+    #chatMessages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .chat-msg {
+      max-width: 88%;
+      padding: 9px 13px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+    .chat-msg.user {
+      align-self: flex-end;
+      background: var(--accent-amber);
+      color: #040405;
+      font-weight: 500;
+      border-bottom-right-radius: 3px;
+    }
+    .chat-msg.assistant {
+      align-self: flex-start;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-primary);
+      border-bottom-left-radius: 3px;
+    }
+    .chat-msg.typing { color: var(--text-tertiary); font-style: italic; }
+    #chatInputRow {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      padding: 10px 12px;
+      border-top: 1px solid var(--card-border);
+      flex-shrink: 0;
+    }
+    #chatText {
+      flex: 1;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 9px 11px;
+      color: var(--text-primary);
+      font-size: 13px;
+      resize: none;
+      max-height: 90px;
+      font-family: var(--font-sans);
+      line-height: 1.45;
+    }
+    #chatText:focus { outline: none; border-color: rgba(242,192,99,0.4); }
+    #chatText::placeholder { color: var(--text-dim); }
+    #chatSendBtn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--accent-amber);
+      color: #040405;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-weight: 700;
+      transition: opacity 0.15s;
+    }
+    #chatSendBtn:disabled { opacity: 0.35; cursor: default; }
+
   </style>
 </head>
 <body>
@@ -3022,6 +3168,22 @@
     </div>
   </div>
 
+</div>
+
+<!-- Chat FAB + Panel -->
+<button id="chatFab" onclick="toggleChat()" title="Coach Chat">💬</button>
+<div id="chatPanel">
+  <div id="chatPanelHeader">
+    <span>COACH CHAT</span>
+    <button onclick="toggleChat()">✕</button>
+  </div>
+  <div id="chatMessages"></div>
+  <div id="chatInputRow">
+    <textarea id="chatText" placeholder="Frag den Coach…" rows="1"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"
+      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,90)+'px'"></textarea>
+    <button id="chatSendBtn" onclick="sendChat()">↑</button>
+  </div>
 </div>
 
 <!-- Claude API Key Modal -->
@@ -5409,6 +5571,99 @@ async function loadRemote() {
 }
 
 loadRemote();
+
+/* ================================================================
+   CHAT
+================================================================ */
+let chatHistory = [];
+let chatOpen = false;
+
+function toggleChat() {
+  chatOpen = !chatOpen;
+  document.getElementById("chatPanel").classList.toggle("open", chatOpen);
+  document.getElementById("chatFab").classList.toggle("open", chatOpen);
+  if (chatOpen) {
+    if (chatHistory.length === 0) {
+      const greeting = "Hey Felix. Was beschäftigt dich gerade?";
+      appendChatMsg("assistant", greeting);
+      chatHistory.push({ role: "assistant", content: greeting });
+    }
+    setTimeout(() => document.getElementById("chatText")?.focus(), 120);
+    scrollChat();
+  }
+}
+
+function appendChatMsg(role, text) {
+  const el = document.createElement("div");
+  el.className = "chat-msg " + role;
+  el.textContent = text;
+  document.getElementById("chatMessages").appendChild(el);
+  scrollChat();
+  return el;
+}
+
+function scrollChat() {
+  const el = document.getElementById("chatMessages");
+  if (el) el.scrollTop = el.scrollHeight;
+}
+
+async function sendChat() {
+  if (!claudeApiKey) { toast("Erst API-Key eintragen (⚙ AI)"); return; }
+  const input = document.getElementById("chatText");
+  const text = input.value.trim();
+  if (!text) return;
+
+  input.value = "";
+  input.style.height = "auto";
+
+  appendChatMsg("user", text);
+  chatHistory.push({ role: "user", content: text });
+
+  const typingEl = appendChatMsg("assistant typing", "…");
+  const btn = document.getElementById("chatSendBtn");
+  btn.disabled = true;
+
+  const h = new Date().getHours();
+  const done = S.todos.filter(t => t.done).length;
+  const total = S.todos.length;
+  const ctx = `[${h} Uhr · Todos ${done}/${total} · Wasser ${S.water}ml · Streak ${S.streak}d]`;
+
+  const messages = chatHistory.map((m, i) => {
+    if (i === 0 && m.role === "assistant") return m;
+    if (i === 1 && m.role === "user") return { role: "user", content: m.content + "\n" + ctx };
+    return m;
+  });
+
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "x-api-key": claudeApiKey,
+        "anthropic-version": "2023-06-01",
+        "content-type": "application/json",
+        "anthropic-dangerous-direct-browser-access": "true"
+      },
+      body: JSON.stringify({
+        model: "claude-haiku-4-5-20251001",
+        max_tokens: 220,
+        system: "Du bist Felix' persönlicher Coach. Felix ist 14, Gymnasiast in Bayern, trainiert. Schreib auf Deutsch. Antworte kurz — max 2-3 Sätze. Stelle Rückfragen, hör zu, frag nach. Kein Motivations-Sprech, kein Jubel.",
+        messages
+      })
+    });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    const reply = data.content?.[0]?.text?.trim() || "—";
+    typingEl.className = "chat-msg assistant";
+    typingEl.textContent = reply;
+    chatHistory.push({ role: "assistant", content: reply });
+  } catch (e) {
+    typingEl.className = "chat-msg assistant";
+    typingEl.textContent = "Fehler: " + e.message;
+  }
+
+  btn.disabled = false;
+  scrollChat();
+}
 </script>
 <script>
 if ('serviceWorker' in navigator) {
