@@ -2205,6 +2205,86 @@
       word-break: break-word;
     }
 
+    /* ============================================================
+       FOOD LOG
+    ============================================================ */
+    .food-total-bar {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .food-total-kcal {
+      font-family: var(--font-mono);
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--text-primary);
+    }
+    .food-total-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+    }
+    .food-bar-track {
+      height: 4px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 2px;
+      margin-bottom: 16px;
+    }
+    .food-bar {
+      height: 4px;
+      background: var(--accent-amber);
+      border-radius: 2px;
+      transition: width 0.4s ease;
+      max-width: 100%;
+    }
+    .food-list {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-bottom: 14px;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+    .food-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      background: rgba(255,255,255,0.02);
+      border-radius: 7px;
+      font-size: 12px;
+    }
+    .food-item-name {
+      flex: 1;
+      color: var(--text-secondary);
+    }
+    .food-item-kcal {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--accent-amber);
+      white-space: nowrap;
+    }
+    .food-item-del {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-size: 11px;
+      padding: 0;
+      line-height: 1;
+      transition: color 0.15s;
+    }
+    .food-item-del:hover { color: var(--accent-red); }
+    .food-add-row {
+      display: grid;
+      grid-template-columns: 1fr 80px auto;
+      gap: 6px;
+      align-items: center;
+    }
+
   </style>
 </head>
 <body>
@@ -2464,6 +2544,25 @@
       </div>
     </div>
 
+    <!-- Food Log -->
+    <div class="card" style="margin-bottom:24px;">
+      <div class="card-label">NUTRITION LOG</div>
+      <div class="card-title" style="margin-bottom:4px;">Essen heute</div>
+      <div class="food-total-bar">
+        <div class="food-total-kcal" id="foodTotalKcal">0</div>
+        <div class="food-total-label">KCAL HEUTE</div>
+      </div>
+      <div class="food-bar-track"><div class="food-bar" id="foodBar" style="width:0%"></div></div>
+      <div class="food-list" id="foodList"></div>
+      <div class="food-add-row">
+        <input class="form-input" id="foodName" placeholder="Mahlzeit (z.B. Haferflocken mit Banane)"
+          onkeydown="if(event.key==='Enter')addFood()"/>
+        <input class="form-input" id="foodKcal" type="number" placeholder="kcal"
+          onkeydown="if(event.key==='Enter')addFood()"/>
+        <button class="primary-btn" onclick="addFood()">+ ADD</button>
+      </div>
+    </div>
+
     <!-- Habit Tracker (full-width above grid) -->
     <div class="card" style="margin-bottom:24px;">
       <div class="habit-header">
@@ -2524,15 +2623,13 @@
         </div>
         <div class="divider"></div>
         <div class="card-label">ADD SUPPLEMENT</div>
-        <div style="display:grid;grid-template-columns:1fr 90px 55px 55px auto;gap:6px;margin-top:8px;align-items:center;">
-          <input class="form-input" id="sName" placeholder="Name [dose]"/>
+        <div style="display:grid;grid-template-columns:1fr 100px auto;gap:6px;margin-top:8px;align-items:center;">
+          <input class="form-input" id="sName" placeholder="Name [Dosis] z.B. Creatin [5g]"/>
           <select class="form-select" id="sWin">
-            <option value="morning">Morning</option>
-            <option value="midday">Midday</option>
-            <option value="evening">Evening</option>
+            <option value="morning">Morgens</option>
+            <option value="midday">Mittags</option>
+            <option value="evening">Abends</option>
           </select>
-          <input class="form-input" id="sStart" type="number" placeholder="h start" min="0" max="23"/>
-          <input class="form-input" id="sEnd"   type="number" placeholder="h end"   min="0" max="23"/>
           <button class="primary-btn" onclick="addSupp()">+ ADD</button>
         </div>
       </div>
@@ -2724,6 +2821,18 @@
 
   <!-- ── TAB 4: WEALTH & COMMITMENTS ───────────────── -->
   <div class="tab-panel" id="tab3">
+
+    <!-- AI Coach — Wealth Tab -->
+    <div class="coach-card" id="coachWealth">
+      <div class="coach-header">
+        <div class="coach-avatar">⚡</div>
+        <div class="coach-title">Wealth Coach</div>
+        <button class="coach-refresh-btn" id="refreshWealth" onclick="refreshCoach('coachWealth','wealth')">↻ AI</button>
+        <button class="coach-toggle" onclick="toggleCoach('coachWealth')">▾ HIDE</button>
+      </div>
+      <div class="coach-insights" id="coachWealthInsights"></div>
+    </div>
+
     <div class="tab3-grid">
 
       <!-- Net Worth -->
@@ -2820,17 +2929,6 @@
         </div>
 
       </div>
-    </div>
-
-    <!-- AI Coach — Wealth Tab -->
-    <div class="coach-card" id="coachWealth" style="margin-top:24px;">
-      <div class="coach-header">
-        <div class="coach-avatar">⚡</div>
-        <div class="coach-title">Wealth Coach</div>
-        <button class="coach-refresh-btn" id="refreshWealth" onclick="refreshCoach('coachWealth','wealth')">↻ AI</button>
-        <button class="coach-toggle" onclick="toggleCoach('coachWealth')">▾ HIDE</button>
-      </div>
-      <div class="coach-insights" id="coachWealthInsights"></div>
     </div>
   </div>
 
@@ -3747,18 +3845,17 @@ updateStatusDots();
 /* ================================================================
    SUPPLEMENTS
 ================================================================ */
+const SUPP_HOURS = { morning: [7, 10], midday: [11, 14], evening: [17, 22] };
+
 function addSupp() {
-  const name  = document.getElementById("sName").value.trim();
-  const tw    = document.getElementById("sWin").value;
-  const start = parseInt(document.getElementById("sStart").value);
-  const end   = parseInt(document.getElementById("sEnd").value);
-  if (!name || isNaN(start) || isNaN(end)) { toast("Fill all supplement fields"); return; }
+  const name = document.getElementById("sName").value.trim();
+  const tw   = document.getElementById("sWin").value;
+  if (!name) { toast("Supplement-Name eingeben"); return; }
+  const [start, end] = SUPP_HOURS[tw] || [7, 10];
   const s = { id: genId(), name, time_window: tw, start_hour: start, end_hour: end, is_low: false };
   S.supps.push(s);
   lsSet("supps", S.supps);
   document.getElementById("sName").value = "";
-  document.getElementById("sStart").value = "";
-  document.getElementById("sEnd").value = "";
   renderSupps();
   if (sb.ok()) sb.post("supplements", { name, time_window: tw, start_hour: start, end_hour: end, is_low: false });
 }
@@ -4967,6 +5064,75 @@ function clearBrainDump() {
   lsSet("brain_dump", "");
   document.getElementById("brainDumpMeta").textContent = "0 chars";
 }
+
+/* ================================================================
+   FOOD LOG
+================================================================ */
+const FOOD_KCAL_GOAL = 2200;
+let foodLog = lsGet("food_" + T, []);
+
+function renderFoodLog() {
+  const list = document.getElementById("foodList");
+  const totalEl = document.getElementById("foodTotalKcal");
+  const barEl = document.getElementById("foodBar");
+  if (!list) return;
+  list.textContent = "";
+  const total = foodLog.reduce((s, e) => s + (e.kcal || 0), 0);
+  if (totalEl) totalEl.textContent = total;
+  if (barEl) {
+    const pct = Math.min(100, Math.round(total / FOOD_KCAL_GOAL * 100));
+    barEl.style.width = pct + "%";
+    barEl.style.background = pct >= 110 ? "var(--accent-red)" : pct >= 90 ? "var(--accent-green)" : "var(--accent-amber)";
+  }
+  if (!foodLog.length) {
+    const empty = document.createElement("div");
+    empty.style.cssText = "font-family:var(--font-mono);font-size:10px;color:var(--text-dim);padding:8px 0;";
+    empty.textContent = "Noch nichts geloggt heute.";
+    list.appendChild(empty);
+    return;
+  }
+  foodLog.forEach(entry => {
+    const row = document.createElement("div");
+    row.className = "food-item";
+    const name = document.createElement("span");
+    name.className = "food-item-name";
+    name.textContent = entry.name;
+    const kcal = document.createElement("span");
+    kcal.className = "food-item-kcal";
+    kcal.textContent = entry.kcal + " kcal";
+    const del = document.createElement("button");
+    del.className = "food-item-del";
+    del.textContent = "✕";
+    del.onclick = () => deleteFoodEntry(entry.id);
+    row.appendChild(name);
+    row.appendChild(kcal);
+    row.appendChild(del);
+    list.appendChild(row);
+  });
+}
+
+function addFood() {
+  const nameEl = document.getElementById("foodName");
+  const kcalEl = document.getElementById("foodKcal");
+  const name = nameEl.value.trim();
+  const kcal = parseInt(kcalEl.value);
+  if (!name) { toast("Mahlzeit eingeben"); return; }
+  if (isNaN(kcal) || kcal <= 0) { toast("Kalorien eingeben"); return; }
+  foodLog.push({ id: Date.now(), name, kcal });
+  lsSet("food_" + T, foodLog);
+  nameEl.value = "";
+  kcalEl.value = "";
+  nameEl.focus();
+  renderFoodLog();
+}
+
+function deleteFoodEntry(id) {
+  foodLog = foodLog.filter(e => e.id !== id);
+  lsSet("food_" + T, foodLog);
+  renderFoodLog();
+}
+
+renderFoodLog();
 
 /* ================================================================
    NW SPARKLINE
