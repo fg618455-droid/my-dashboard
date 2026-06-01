@@ -3387,7 +3387,7 @@ renderWaterSmart();
 /* ================================================================
    RING SETTINGS (Day Range)
 ================================================================ */
-let ringSettings = lsGet("ringSettings", { wake: 8, sleep: 24 });
+var ringSettings = lsGet("ringSettings", { wake: 8, sleep: 24 });
 
 function saveRingSettings() {
   const w = parseInt(document.getElementById("ringWakeH").value) || 8;
@@ -4509,7 +4509,7 @@ autoDeduct();
 /* ================================================================
    HEALTH VITALS (Apple Health Bridge)
 ================================================================ */
-let healthToday = lsGet("health_" + T, null);
+var healthToday = lsGet("health_" + T, null);
 
 function renderHealthVitals(data) {
   if (!data) return;
@@ -4586,9 +4586,9 @@ if (healthToday) renderHealthVitals(healthToday);
 /* ================================================================
    SCHOOL MODULE
 ================================================================ */
-let grades   = lsGet("grades_local", []);
-let exams    = lsGet("exams_local", []);
-let homework = lsGet("homework_local", []);
+var grades   = lsGet("grades_local", []);
+var exams    = lsGet("exams_local", []);
+var homework = lsGet("homework_local", []);
 let absences = lsGet("absences_local", { used: 0, limit: 10, log: [] });
 
 /* --- GRADES --- */
@@ -4816,7 +4816,7 @@ setInterval(renderExams, 3600000);
 /* ================================================================
    FOCUS TIMER (POMODORO)
 ================================================================ */
-const focusState = {
+var focusState = {
   totalSecs: 25 * 60,
   remaining: 25 * 60,
   active: false,
