@@ -2118,6 +2118,96 @@
     .api-key-pill:hover { color: var(--accent-amber); }
     .api-key-pill.has-key { color: var(--accent-green); }
 
+    .api-key-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .api-key-modal.open { display: flex; }
+    .api-key-box {
+      background: #0d0d0f;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 28px;
+      width: min(420px, 92vw);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+    }
+    .api-key-box h3 {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--text-primary);
+    }
+    .api-key-box p {
+      font-size: 11px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+    .api-key-box p a {
+      color: var(--accent-amber);
+      text-decoration: none;
+    }
+    .api-key-input {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .api-key-input:focus { border-color: var(--accent-amber); }
+    .api-key-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+    .api-key-cancel {
+      background: none;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      letter-spacing: 0.06em;
+    }
+    .api-key-save {
+      background: rgba(242,192,99,0.1);
+      border: 1px solid rgba(242,192,99,0.3);
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--accent-amber);
+      cursor: pointer;
+      letter-spacing: 0.06em;
+      transition: all 0.15s;
+    }
+    .api-key-save:hover { background: rgba(242,192,99,0.18); }
+    .api-key-delete {
+      background: rgba(224,88,88,0.07);
+      border: 1px solid rgba(224,88,88,0.2);
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--accent-red);
+      cursor: pointer;
+      letter-spacing: 0.06em;
+    }
+
     .coach-refresh-btn {
       background: none;
       border: 1px solid var(--card-border);
@@ -2934,6 +3024,22 @@
 
 </div>
 
+<!-- Claude API Key Modal -->
+<div class="api-key-modal" id="apiKeyModal" onclick="if(event.target===this)closeApiKeyModal()">
+  <div class="api-key-box">
+    <h3>⚡ Claude API Key</h3>
+    <p>Key erstellen auf <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> → API Keys → Create Key. Kostet ~0,001€ pro Coach-Abfrage.</p>
+    <input class="api-key-input" id="apiKeyInput" type="password"
+      placeholder="sk-ant-api03-..."
+      onkeydown="if(event.key==='Enter')saveApiKey()"/>
+    <div class="api-key-actions">
+      <button class="api-key-delete" id="apiKeyDeleteBtn" onclick="deleteApiKey()" style="display:none;">Key entfernen</button>
+      <button class="api-key-cancel" onclick="closeApiKeyModal()">Abbrechen</button>
+      <button class="api-key-save" onclick="saveApiKey()">Speichern</button>
+    </div>
+  </div>
+</div>
+
 <!-- iOS Shortcut Setup Modal -->
 <div class="shortcut-modal" id="shortcutModal" onclick="if(event.target===this)closeShortcutGuide()">
   <div class="shortcut-box">
@@ -3319,13 +3425,41 @@ function updateApiKeyPill() {
 updateApiKeyPill();
 
 function setApiKey() {
-  const current = claudeApiKey ? "sk-ant-***gesetzt***" : "";
-  const key = prompt("Claude API Key eingeben (leer = entfernen):", current);
-  if (key === null) return;
-  claudeApiKey = key.trim().replace(/^sk-ant-\*+\*+$/, claudeApiKey);
-  lsSet("claude_api_key", claudeApiKey);
+  const modal = document.getElementById("apiKeyModal");
+  const input = document.getElementById("apiKeyInput");
+  const delBtn = document.getElementById("apiKeyDeleteBtn");
+  if (!modal) return;
+  input.value = "";
+  input.placeholder = claudeApiKey ? "sk-ant-*** (neuen Key eingeben zum Ersetzen)" : "sk-ant-api03-...";
+  if (delBtn) delBtn.style.display = claudeApiKey ? "block" : "none";
+  modal.classList.add("open");
+  setTimeout(() => input.focus(), 80);
+}
+
+function saveApiKey() {
+  const input = document.getElementById("apiKeyInput");
+  const val = input.value.trim();
+  if (val) {
+    claudeApiKey = val;
+    lsSet("claude_api_key", claudeApiKey);
+    updateApiKeyPill();
+    toast("Claude API Key gesetzt ✓");
+  }
+  closeApiKeyModal();
+}
+
+function deleteApiKey() {
+  claudeApiKey = "";
+  lsSet("claude_api_key", "");
+  Object.keys(coachAiCache).forEach(k => delete coachAiCache[k]);
   updateApiKeyPill();
-  toast(claudeApiKey ? "Claude API Key gesetzt ✓" : "API Key entfernt");
+  toast("Key entfernt");
+  closeApiKeyModal();
+}
+
+function closeApiKeyModal() {
+  const modal = document.getElementById("apiKeyModal");
+  if (modal) modal.classList.remove("open");
 }
 
 async function callClaudeApi(userMessage) {
