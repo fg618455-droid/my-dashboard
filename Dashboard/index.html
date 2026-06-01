@@ -2461,16 +2461,6 @@
             <option value="900">Intensiv</option>
           </select>
         </div>
-        <div>
-          <div class="water-calc-label">Koffein (mg/Tag)</div>
-          <input class="form-input" id="wcCaffeine" type="number" placeholder="100" value="" oninput="calcWaterTarget()"/>
-        </div>
-      </div>
-      <div class="water-calc-row-2">
-        <label style="display:flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:10px;color:var(--text-secondary);cursor:pointer;">
-          <input type="checkbox" id="wcAdhd" onchange="calcWaterTarget()" style="accent-color:var(--accent-amber);"/>
-          Stimulanzien (Concerta / Vyvanse) → +500 ml
-        </label>
       </div>
     </div>
 
@@ -3112,17 +3102,15 @@ updateRing();
 /* ================================================================
    WATER SMART TRACKER
 ================================================================ */
-let waterSettings = lsGet("waterSettings", { weight: 70, activity: 600, caffeine: 100, adhd: true });
+let waterSettings = lsGet("waterSettings", { weight: 70, activity: 600 });
 let waterTarget = lsGet("waterTarget", 2500);
 
 function calcWaterTarget() {
-  const w  = parseFloat(document.getElementById("wcWeight").value)   || waterSettings.weight;
-  const a  = parseInt(document.getElementById("wcActivity").value)    || waterSettings.activity;
-  const c  = parseFloat(document.getElementById("wcCaffeine").value)  || waterSettings.caffeine;
-  const ad = document.getElementById("wcAdhd").checked;
-  waterSettings = { weight: w, activity: a, caffeine: c, adhd: ad };
+  const w = parseFloat(document.getElementById("wcWeight").value) || waterSettings.weight;
+  const a = parseInt(document.getElementById("wcActivity").value) || waterSettings.activity;
+  waterSettings = { weight: w, activity: a };
   lsSet("waterSettings", waterSettings);
-  let target = Math.round(w * 35 + a + (c * 1.5) + (ad ? 500 : 0));
+  let target = Math.round(w * 35 + a);
   target = Math.max(1500, Math.min(5000, target));
   waterTarget = target;
   lsSet("waterTarget", target);
@@ -3186,12 +3174,8 @@ function initWaterCalcUI() {
   const ws = waterSettings;
   const wEl = document.getElementById("wcWeight");
   const aEl = document.getElementById("wcActivity");
-  const cEl = document.getElementById("wcCaffeine");
-  const dEl = document.getElementById("wcAdhd");
   if (wEl) wEl.value = ws.weight || 70;
   if (aEl) aEl.value = ws.activity || 600;
-  if (cEl) cEl.value = ws.caffeine || 100;
-  if (dEl) dEl.checked = ws.adhd !== false;
 }
 initWaterCalcUI();
 renderWaterSmart();
@@ -3439,7 +3423,7 @@ function buildHealthInsights() {
     else if (hl.steps >= 10000) ins.push(coachInsight(hl.steps.toLocaleString("de-DE") + " Schritte. Bewegungsziel erreicht.", "good"));
   }
   const waterPct = Math.round(S.water / (typeof waterTarget !== "undefined" ? waterTarget : 2000) * 100);
-  if (waterPct < 50) ins.push(coachInsight("Nur " + waterPct + "% Wasserziel erreicht. Besonders wichtig bei Concerta.", "alert"));
+  if (waterPct < 50) ins.push(coachInsight("Nur " + waterPct + "% Wasserziel erreicht. Mehr trinken!", "alert"));
   else if (waterPct >= 100) ins.push(coachInsight("Hydration-Ziel erreicht. 💧", "good"));
   if (hl.hrv && hl.hrv < 40) ins.push(coachInsight("Niedrige HRV (" + hl.hrv + " ms) — Körper erholt sich noch. Heute lieber Ausdauer statt Intensität.", "warn"));
   return ins;
