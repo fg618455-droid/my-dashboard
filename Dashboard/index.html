@@ -4,6 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FELIX // DASHBOARD</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="FELIX" />
+  <meta name="theme-color" content="#040405" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon.svg" />
   <style>
     /* ============================================================
        RESET & VARIABLES
@@ -3149,7 +3155,7 @@ function buildFocusInsights() {
     else if (remaining > 0) ins.push(coachInsight("Noch " + remaining + " Task" + (remaining===1?"":"s") + " heute. Fang mit der schwersten an — Eat the frog.", "info"));
   }
   if (S.streak >= 7) ins.push(coachInsight("🔥 " + S.streak + "-Tage-Streak. Nicht jetzt brechen.", "good"));
-  const ses = focusState ? focusState.sessions : 0;
+  const ses = typeof focusState !== "undefined" ? focusState.sessions : 0;
   if (ses >= 4) ins.push(coachInsight(ses + " Focus-Sessions heute. Exzellente Disziplin.", "good"));
   else if (ses >= 1) ins.push(coachInsight(ses + " Focus-Session" + (ses===1?"":"s") + " heute. Noch " + (4-ses) + " für ein vollständiges Protokoll.", "info"));
   return ins;
@@ -4800,6 +4806,11 @@ async function loadRemote() {
 }
 
 loadRemote();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(() => {});
+}
 </script>
 </body>
 </html>
