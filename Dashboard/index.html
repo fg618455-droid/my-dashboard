@@ -3474,7 +3474,7 @@ async function callClaudeApi(userMessage) {
     body: JSON.stringify({
       model: "claude-haiku-4-5-20251001",
       max_tokens: 350,
-      system: "Du bist Felix' persönlicher Life-OS Coach. Felix ist 14 Jahre alt, Gymnasiast in Bayern, trainiert regelmäßig, hat ADHS und nimmt Concerta. Antworte immer auf Deutsch. Gib genau 2-3 kurze, direkte, personalisierte Coaching-Insights. Pro Insight max 2 Sätze. Kein Markdown, keine Aufzählungszeichen, keine Nummerierung. Trenne Insights durch Zeilenumbrüche. Sei konkret, ehrlich und motivierend.",
+      system: "Du bist Felix' persönlicher Life-OS Coach. Felix ist 14 Jahre alt, Gymnasiast in Bayern, trainiert regelmäßig. Antworte immer auf Deutsch. Stell 2-3 konkrete Fragen zu Felix' aktuellem Status — was er vorhat, wie er etwas angehen will, was ihn gerade beschäftigt oder bremst. Du kannst eine kurze Beobachtung machen, aber kein Motivations-Sprech, keine Lobhudelei, keine Durchhalteparolen. Kein Markdown, keine Aufzählungszeichen, keine Nummerierung. Trenne Fragen durch Zeilenumbrüche.",
       messages: [{ role: "user", content: userMessage }]
     })
   });
@@ -3629,35 +3629,35 @@ function buildFocusInsights() {
   const total = S.todos.length;
   const remaining = total - done;
   const ins = [];
-  if (total === 0) ins.push(coachInsight("Noch keine Ziele für heute. Setz dir 2–3 konkrete Aufgaben, bevor du anfängst.", "warn"));
-  else if (done === total) ins.push(coachInsight("Alle " + total + " Ziele erledigt. Starker Tag — nutze den Rest für Deep Work oder plane morgen vor.", "good"));
+  if (total === 0) ins.push(coachInsight("Noch keine Ziele für heute. Was willst du heute schaffen?", "warn"));
+  else if (done === total) ins.push(coachInsight("Alle " + total + " Ziele erledigt. Was machst du mit dem Rest des Tages?", "good"));
   else {
-    if (h >= 15 && remaining > 2) ins.push(coachInsight("⏰ Es ist " + h + " Uhr und du hast noch " + remaining + " Aufgaben offen. Priorisiere die wichtigste — den Rest pushe auf morgen.", "warn"));
-    else if (h >= 12 && remaining > 0) ins.push(coachInsight(remaining + " Aufgabe" + (remaining===1?"":"n") + " übrig. Nachmittags-Focus-Block starten?", "info"));
-    else if (remaining > 0) ins.push(coachInsight("Noch " + remaining + " Task" + (remaining===1?"":"s") + " heute. Fang mit der schwersten an — Eat the frog.", "info"));
+    if (h >= 15 && remaining > 2) ins.push(coachInsight("Es ist " + h + " Uhr, noch " + remaining + " Aufgaben offen. Welche eine muss heute wirklich fertig werden?", "warn"));
+    else if (h >= 12 && remaining > 0) ins.push(coachInsight(remaining + " Aufgabe" + (remaining===1?"":"n") + " übrig. Wann startest du den nächsten Block?", "info"));
+    else if (remaining > 0) ins.push(coachInsight("Noch " + remaining + " Task" + (remaining===1?"":"s") + " heute. Womit fängst du an?", "info"));
   }
-  if (S.streak >= 7) ins.push(coachInsight("🔥 " + S.streak + "-Tage-Streak. Nicht jetzt brechen.", "good"));
+  if (S.streak >= 7) ins.push(coachInsight(S.streak + " Tage dabei. Was hilft dir, dranzubleiben?", "good"));
   const ses = typeof focusState !== "undefined" ? focusState.sessions : 0;
-  if (ses >= 4) ins.push(coachInsight(ses + " Focus-Sessions heute. Exzellente Disziplin.", "good"));
-  else if (ses >= 1) ins.push(coachInsight(ses + " Focus-Session" + (ses===1?"":"s") + " heute. Noch " + (4-ses) + " für ein vollständiges Protokoll.", "info"));
+  if (ses >= 4) ins.push(coachInsight(ses + " Focus-Sessions heute. Reicht das für deine Ziele?", "good"));
+  else if (ses >= 1) ins.push(coachInsight(ses + " Session bisher. Wann planst du die nächste ein?", "info"));
   return ins;
 }
 
 function buildHealthInsights() {
   const hl = typeof healthToday !== "undefined" ? healthToday : null;
   const ins = [];
-  if (!hl) { ins.push(coachInsight("Keine Vitaldaten für heute. Sync über iOS Shortcut oder manuell eintragen.", "warn")); return ins; }
-  if (hl.sleep_hours && hl.sleep_hours < 6) ins.push(coachInsight("⚠ Nur " + hl.sleep_hours + "h Schlaf. Kognitive Leistung um ~20% reduziert. Heute früher ins Bett.", "alert"));
-  else if (hl.sleep_hours && hl.sleep_hours < 7) ins.push(coachInsight(hl.sleep_hours + "h Schlaf. Knapp — versuche heute früher schlafen zu gehen.", "warn"));
-  else if (hl.sleep_hours) ins.push(coachInsight(hl.sleep_hours + "h Schlaf. Gut erholt.", "good"));
+  if (!hl) { ins.push(coachInsight("Keine Vitaldaten für heute. Hast du deinen iOS Shortcut schon eingerichtet?", "warn")); return ins; }
+  if (hl.sleep_hours && hl.sleep_hours < 6) ins.push(coachInsight("Nur " + hl.sleep_hours + "h Schlaf. Merkst du den Unterschied gerade?", "alert"));
+  else if (hl.sleep_hours && hl.sleep_hours < 7) ins.push(coachInsight(hl.sleep_hours + "h Schlaf. Wann gehst du heute ins Bett?", "warn"));
+  else if (hl.sleep_hours) ins.push(coachInsight(hl.sleep_hours + "h Schlaf. Fühlst du dich fit?", "good"));
   if (hl.steps) {
-    if (hl.steps < 3000) ins.push(coachInsight("Nur " + hl.steps.toLocaleString("de-DE") + " Schritte. Ein 20-Min-Spaziergang würde Fokus und NEAT-Verbrauch steigern.", "warn"));
-    else if (hl.steps >= 10000) ins.push(coachInsight(hl.steps.toLocaleString("de-DE") + " Schritte. Bewegungsziel erreicht.", "good"));
+    if (hl.steps < 3000) ins.push(coachInsight("Erst " + hl.steps.toLocaleString("de-DE") + " Schritte. Wann kommst du heute noch raus?", "warn"));
+    else if (hl.steps >= 10000) ins.push(coachInsight(hl.steps.toLocaleString("de-DE") + " Schritte — war das ein aktiver Tag?", "good"));
   }
   const waterPct = Math.round(S.water / (typeof waterTarget !== "undefined" ? waterTarget : 2000) * 100);
-  if (waterPct < 50) ins.push(coachInsight("Nur " + waterPct + "% Wasserziel erreicht. Mehr trinken!", "alert"));
-  else if (waterPct >= 100) ins.push(coachInsight("Hydration-Ziel erreicht. 💧", "good"));
-  if (hl.hrv && hl.hrv < 40) ins.push(coachInsight("Niedrige HRV (" + hl.hrv + " ms) — Körper erholt sich noch. Heute lieber Ausdauer statt Intensität.", "warn"));
+  if (waterPct < 50) ins.push(coachInsight("Erst " + waterPct + "% Wasseraufnahme. Wann trinkst du das nächste Glas?", "alert"));
+  else if (waterPct >= 100) ins.push(coachInsight("Wasserziel erreicht. Was hat dir dabei geholfen?", "good"));
+  if (hl.hrv && hl.hrv < 40) ins.push(coachInsight("HRV bei " + hl.hrv + " ms — eher ein ruhiger Tag heute oder trotzdem Training?", "warn"));
   return ins;
 }
 
@@ -3669,9 +3669,9 @@ function buildSchuleInsights() {
   examList.forEach(e => {
     const diff = Math.ceil((new Date(e.exam_date) - new Date(T)) / 86400000);
     if (diff < 0) return;
-    if (diff <= 1) ins.push(coachInsight("🚨 " + e.subject + " — Prüfung morgen! Letzte Wiederholung, nicht mehr viel Neues lernen.", "alert"));
-    else if (diff <= 3) ins.push(coachInsight("⚠ " + e.subject + " in " + diff + " Tagen. Fokus auf Altfragen und schwache Kapitel.", "warn"));
-    else if (diff <= 7) ins.push(coachInsight(e.subject + " in " + diff + " Tagen. Lernplan aufsetzen und täglich 45 min einplanen.", "info"));
+    if (diff <= 1) ins.push(coachInsight("🚨 " + e.subject + " morgen — was lernst du heute noch?", "alert"));
+    else if (diff <= 3) ins.push(coachInsight(e.subject + " in " + diff + " Tagen. Wie weit bist du mit dem Stoff?", "warn"));
+    else if (diff <= 7) ins.push(coachInsight(e.subject + " in " + diff + " Tagen. Hast du schon einen Lernplan?", "info"));
   });
   const todayHw = hwList.filter(h => !h.done && h.due_date === T);
   if (todayHw.length > 0) ins.push(coachInsight("📌 Heute fällig: " + todayHw.map(h=>h.task).join(", "), "warn"));
@@ -3681,8 +3681,8 @@ function buildSchuleInsights() {
       gradesList.forEach(g => { sw += (g.weight||1); swv += g.value * (g.weight||1); });
       return sw ? (swv/sw) : null;
     })();
-    if (avgData !== null && avgData > 3.5) ins.push(coachInsight("Notenschnitt " + avgData.toFixed(2) + ". Welches Fach zieht den Schnitt runter? Da maximal Ressourcen investieren.", "warn"));
-    else if (avgData !== null && avgData <= 2.5) ins.push(coachInsight("Notenschnitt " + avgData.toFixed(2) + ". Starke Leistung.", "good"));
+    if (avgData !== null && avgData > 3.5) ins.push(coachInsight("Schnitt bei " + avgData.toFixed(2) + ". Welches Fach macht dir gerade am meisten Probleme?", "warn"));
+    else if (avgData !== null && avgData <= 2.5) ins.push(coachInsight("Schnitt bei " + avgData.toFixed(2) + ". Was läuft da gut?", "good"));
   }
   return ins;
 }
@@ -3690,19 +3690,19 @@ function buildSchuleInsights() {
 function buildWealthInsights() {
   const nw = typeof netWorth === "function" ? netWorth() : 0;
   const ins = [];
-  if (nw === 0) { ins.push(coachInsight("Füge deine Konten hinzu, um deinen Nettowert zu tracken.", "info")); return ins; }
+  if (nw === 0) { ins.push(coachInsight("Noch keine Konten eingetragen. Was sind deine finanziellen Ziele?", "info")); return ins; }
   const nwHist = lsGet("nw_history", {});
   const yesterday = new Date(Date.now()-86400000).toISOString().split("T")[0];
   if (nwHist[yesterday] !== undefined) {
     const diff = nw - nwHist[yesterday];
-    if (diff > 0) ins.push(coachInsight("Nettowert gestern: +" + fmt(diff) + ". Auf Kurs bleiben.", "good"));
-    else if (diff < 0) ins.push(coachInsight("Nettowert gestern: " + fmt(diff) + ". Prüfe ob das eine Ausgabe war oder Marktschwankung.", "warn"));
+    if (diff > 0) ins.push(coachInsight("+" + fmt(diff) + " seit gestern. Was hat sich verändert?", "good"));
+    else if (diff < 0) ins.push(coachInsight(fmt(diff) + " seit gestern — war das eine geplante Ausgabe?", "warn"));
   }
   const bucketItems = lsGet("bucketList", []);
   bucketItems.forEach(b => {
     const pct = Math.min(100, Math.round(nw / b.amount * 100));
-    if (pct >= 100) ins.push(coachInsight("🎯 Du könntest dir '" + b.name + "' jetzt leisten (" + pct + "% des Ziels). Bewusste Entscheidung treffen.", "good"));
-    else if (pct >= 75) ins.push(coachInsight(pct + "% von '" + b.name + "' erreicht (" + fmt(nw) + " von " + fmt(b.amount) + "). Noch " + fmt(b.amount - nw) + " weg.", "info"));
+    if (pct >= 100) ins.push(coachInsight("Du könntest dir '" + b.name + "' jetzt leisten. Willst du das?", "good"));
+    else if (pct >= 75) ins.push(coachInsight(pct + "% von '" + b.name + "' (" + fmt(nw) + " von " + fmt(b.amount) + "). Wie lange noch?", "info"));
   });
   const subs = S.subs || [];
   const today = parseInt(T.split("-")[2]);
