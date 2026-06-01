@@ -11,6 +11,7 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
+      color-scheme: dark;
       --bg: #040405;
       --card-bg: rgba(255,255,255,0.035);
       --card-border: rgba(255,255,255,0.055);
@@ -2379,6 +2380,32 @@
       </div>
     </div>
 
+    <!-- Gym Engine -->
+    <div class="card" style="margin-bottom:24px;">
+      <div class="card-label">PROGRESSIVE OVERLOAD</div>
+      <div class="card-title" style="margin-bottom:14px;">Gym Engine</div>
+      <div class="venue-row">
+        <button class="venue-btn active" id="vHome" onclick="setVenue('Home Base',this)">🏠 Home Base</button>
+        <button class="venue-btn" id="vGym" onclick="setVenue('Gym',this)">🏋️ Gym</button>
+      </div>
+      <div class="venue-row">
+        <button class="venue-btn active" id="sUpper" onclick="setSplit('Upper Push A',this)">Upper Push A</button>
+        <button class="venue-btn" id="sLower" onclick="setSplit('Lower Pull B',this)">Lower Pull B</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 80px 70px 65px 28px;gap:6px;margin-bottom:4px;padding:0 2px;">
+        <div class="card-label" style="margin:0;">EXERCISE</div>
+        <div class="card-label" style="margin:0;">KG</div>
+        <div class="card-label" style="margin:0;">REPS</div>
+        <div class="card-label" style="margin:0;">STEP</div>
+        <div></div>
+      </div>
+      <div id="exRows"></div>
+      <div class="overload-banner" id="overloadBanner"></div>
+      <button class="primary-btn" onclick="addExRow()" style="width:100%;margin-top:10px;background:rgba(107,227,164,0.04);border-color:rgba(107,227,164,0.14);color:var(--accent-green);">+ ADD EXERCISE</button>
+      <button class="workout-done-btn" onclick="finishWorkout()">✓ WORKOUT DONE</button>
+      <div class="comp-row" id="compRow"></div>
+    </div>
+
     <div class="tab2-grid">
 
       <!-- Supplements -->
@@ -2963,27 +2990,6 @@ updateRing();
 /* ================================================================
    WATER
 ================================================================ */
-async function adjustWater(d) {
-  S.water = Math.max(0, S.water + d);
-  lsSet("water_" + T, S.water);
-  S.waterH[T] = S.water;
-  lsSet("waterH", S.waterH);
-  renderWater();
-  if (sb.ok() && d > 0) await sb.post("water_logs", { date_str: T, amount_ml: d });
-}
-
-function renderWater() {
-  document.getElementById("waterAmt").textContent = S.water + " / 2000 ml";
-  const grid = document.getElementById("waterGrid");
-  grid.innerHTML = "";
-  for (let i = 13; i >= 0; i--) {
-    const d = new Date(Date.now() - i*86400000).toISOString().split("T")[0];
-    const dot = document.createElement("div");
-    dot.className = "water-day-dot" + (d===T ? " today" : (S.waterH[d]>=2000 ? " filled" : ""));
-    grid.appendChild(dot);
-  }
-}
-renderWater();
 
 /* ================================================================
    WATER SMART TRACKER
@@ -3588,6 +3594,7 @@ function renderSupps() {
     ticker.classList.remove("on");
   }
 }
+if (!S.supps.length) { S.supps = defaultSupps(); lsSet("supps", S.supps); }
 renderSupps();
 setInterval(renderSupps, 60000);
 
@@ -4785,7 +4792,7 @@ async function loadRemote() {
   const rHw = await sb.get("homework", "order=due_date.asc");
   if (rHw && rHw.length) { homework = rHw.map(x=>({id:x.id,task:x.task,due_date:x.due_date,done:x.done})); lsSet("homework_local", homework); }
 
-  renderTodos(); renderWater(); renderSupps(); drawWeightGraph();
+  renderTodos(); renderSupps(); drawWeightGraph();
   updateNW(); renderAccounts(); renderPie(); syncOrderDrop(); renderSubs();
   renderHabits(); renderMoodHistory(); drawNwSpark();
   renderGrades(); renderExams(); renderHomework(); renderAbsences();
